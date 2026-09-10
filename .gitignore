@@ -1,0 +1,42 @@
+# Entorno virtual
+.venv/
+venv/
+env/
+ENV/
+
+# Archivos con secretos
+.env
+*.env
+
+# Base de datos
+db.sqlite3
+db.sqlite3-journal
+
+# Archivos estáticos generados
+staticfiles/
+media/
+
+# Archivos de caché de Python
+__pycache__/
+*.py[cod]
+*.pyc
+*.pyo
+.pytest_cache/
+.ruff_cache/
+
+# Archivos del editor
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Archivos compilados
+*.so
+*.egg-info/
+dist/
+build/
