@@ -38,6 +38,72 @@ class Marca(models.Model):
     def __str__(self):
         return self.nombre
 
+class UnidadMedida(models.Model):
+    """
+    Unidad de medida para los productos.
+    Ej: Unidad, Caja, Pack x10, Display.
+    """
+    nombre = models.CharField('Nombre', max_length=50, unique=True)
+    abreviatura = models.CharField(
+        'Abreviatura',
+        max_length=10,
+        unique=True,
+        help_text='Ej: UND, CJ, PACK'
+    )
+    activo = models.BooleanField('Activo', default=True)
+
+    class Meta:
+        verbose_name = 'Unidad de medida'
+        verbose_name_plural = 'Unidades de medida'
+        ordering = ['nombre']
+
+    def __str__(self):
+        return f'{self.nombre} ({self.abreviatura})'
+
+
+class Proveedor(models.Model):
+    """
+    Proveedor o distribuidor de los productos.
+    """
+    TIPOS_DOCUMENTO = (
+        ('RUC', 'RUC'),
+        ('CED', 'Cédula'),
+        ('PAS', 'Pasaporte'),
+    )
+    
+    tipo_documento = models.CharField(
+        'Tipo de documento',
+        max_length=3,
+        choices=TIPOS_DOCUMENTO,
+        default='RUC'
+    )
+    numero_documento = models.CharField(
+        'Número de documento',
+        max_length=20,
+        unique=True
+    )
+    razon_social = models.CharField('Razón social', max_length=200)
+    nombre_comercial = models.CharField(
+        'Nombre comercial',
+        max_length=200,
+        blank=True
+    )
+    contacto = models.CharField('Persona de contacto', max_length=150, blank=True)
+    telefono = models.CharField('Teléfono', max_length=20, blank=True)
+    email = models.EmailField('Email', blank=True)
+    direccion = models.CharField('Dirección', max_length=300, blank=True)
+    ciudad = models.CharField('Ciudad', max_length=100, blank=True)
+    pais = models.CharField('País', max_length=100, default='Ecuador')
+    activo = models.BooleanField('Activo', default=True)
+    fecha_registro = models.DateTimeField('Fecha de registro', auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Proveedor'
+        verbose_name_plural = 'Proveedores'
+        ordering = ['razon_social']
+
+    def __str__(self):
+        return f'{self.razon_social} ({self.numero_documento})'
 
 class Producto(models.Model):
     """
@@ -62,6 +128,22 @@ class Producto(models.Model):
         on_delete=models.PROTECT,
         related_name='productos',
         verbose_name='Categoría'
+    )
+    unidad_medida = models.ForeignKey(
+        UnidadMedida,
+        on_delete=models.PROTECT,
+        related_name='productos',
+        verbose_name='Unidad de medida',
+        null=True,
+        blank=True
+    )
+    proveedor = models.ForeignKey(
+        Proveedor,
+        on_delete=models.PROTECT,
+        related_name='productos',
+        verbose_name='Proveedor principal',
+        null=True,
+        blank=True
     )
     especificaciones = models.TextField(
         'Especificaciones técnicas',
