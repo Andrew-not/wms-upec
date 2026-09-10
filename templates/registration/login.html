@@ -1,141 +1,158 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar sesión · WMS TechStock</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        .login-card {
-            background: white;
-            border-radius: 15px;
-            padding: 45px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            max-width: 420px;
-            width: 100%;
-        }
-        .logo {
-            text-align: center;
-            font-size: 3.5em;
-            margin-bottom: 10px;
-        }
-        h1 {
-            text-align: center;
-            color: #2c3e50;
-            font-size: 1.8em;
-            margin-bottom: 5px;
-        }
-        .subtitle {
-            text-align: center;
-            color: #7f8c8d;
-            font-size: 0.9em;
-            margin-bottom: 30px;
-        }
-        .field {
-            margin-bottom: 18px;
-        }
-        label {
-            display: block;
-            color: #34495e;
-            font-size: 0.9em;
-            font-weight: 600;
-            margin-bottom: 6px;
-        }
-        input[type="text"], input[type="password"] {
-            width: 100%;
-            padding: 12px 14px;
-            border: 1.5px solid #dfe6e9;
-            border-radius: 8px;
-            font-size: 1em;
-            transition: border-color 0.2s;
-        }
-        input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        .btn-login {
-            width: 100%;
-            padding: 13px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-            margin-top: 10px;
-        }
-        .btn-login:hover {
-            background: #5568d3;
-        }
-        .error {
-            background: #ffe5e5;
-            color: #c0392b;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 0.85em;
-            margin-bottom: 18px;
-            border-left: 4px solid #e74c3c;
-        }
-        .footer {
-            text-align: center;
-            color: #95a5a6;
-            font-size: 0.8em;
-            margin-top: 25px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-        }
-    </style>
+    <title>Iniciar sesión · TechStock WMS</title>
+
+    <!-- Fuentes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Tailwind -->
+    <link rel="stylesheet" href="{% static 'css/output.css' %}">
 </head>
-<body>
-    <div class="login-card">
-        <div class="logo">📦</div>
-        <h1>WMS TechStock</h1>
-        <p class="subtitle">Sistema de Gestión de Almacenes</p>
+<body class="min-h-screen bg-base-900 text-slate-100 font-sans antialiased">
 
-        {% if form.errors %}
-            <div class="error">
-                Usuario o contraseña incorrectos. Intenta de nuevo.
+<!-- Fondo con gradientes sutiles -->
+<div class="fixed inset-0 -z-10">
+    <div class="absolute inset-0 bg-base-900"></div>
+    <div class="absolute top-0 left-1/4 w-96 h-96 bg-accent-blue/10 rounded-full blur-3xl"></div>
+    <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-accent-purple/10 rounded-full blur-3xl"></div>
+    <div class="absolute top-1/2 left-1/2 w-64 h-64 bg-accent-cyan/5 rounded-full blur-3xl"></div>
+</div>
+
+<!-- Contenido -->
+<div class="min-h-screen flex items-center justify-center p-4">
+
+    <div class="w-full max-w-md">
+
+        <!-- Logo y marca -->
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl
+                        bg-gradient-to-br from-accent-blue to-accent-purple
+                        shadow-2xl shadow-sky-500/30 mb-4">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                </svg>
             </div>
-        {% endif %}
+            <h1 class="font-display text-3xl font-bold text-white mb-1">
+                TechStock
+            </h1>
+            <p class="text-slate-400 text-sm">
+                Sistema de Gestión de Almacenes
+            </p>
+        </div>
 
-        {% if next %}
-            <div class="error">
-                Debes iniciar sesión para acceder a esa página.
+        <!-- Card del formulario -->
+        <div class="bg-base-800/80 backdrop-blur-xl border border-base-600/50 rounded-2xl p-8 shadow-2xl shadow-black/40">
+
+            <h2 class="font-display text-xl font-bold text-white mb-1">
+                Iniciar sesión
+            </h2>
+            <p class="text-slate-400 text-sm mb-6">
+                Accede con tus credenciales institucionales
+            </p>
+
+            {% if form.errors %}
+                <div class="mb-5 flex items-start gap-3 p-3 rounded-lg bg-red-500/10 border border-red-500/20">
+                    <svg class="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                    <div class="text-sm text-red-300">
+                        Usuario o contraseña incorrectos. Intenta de nuevo.
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if next %}
+                {% if user.is_authenticated %}
+                    <div class="mb-5 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-sm text-amber-300">
+                        No tienes permiso para acceder a esa página.
+                    </div>
+                {% else %}
+                    <div class="mb-5 p-3 rounded-lg bg-sky-500/10 border border-sky-500/20 text-sm text-sky-300">
+                        Inicia sesión para acceder a esa página.
+                    </div>
+                {% endif %}
+            {% endif %}
+
+            <form method="post" action="{% url 'login' %}" class="space-y-5">
+                {% csrf_token %}
+
+                <!-- Usuario -->
+                <div>
+                    <label for="id_username" class="block text-sm font-medium text-slate-300 mb-2">
+                        Usuario
+                    </label>
+                    <div class="relative">
+                        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                        <input type="text"
+                               name="username"
+                               id="id_username"
+                               placeholder="tu.usuario"
+                               autofocus
+                               required
+                               class="w-full pl-10 pr-4 py-3 rounded-lg
+                                      bg-base-900 border border-base-600
+                                      text-white placeholder-slate-500
+                                      focus:border-accent-blue focus:ring-2 focus:ring-accent-blue/20
+                                      outline-none transition-all">
+                    </div>
+                </div>
+
+                <!-- Contraseña -->
+                <div>
+                    <label for="id_password" class="block text-sm font-medium text-slate-300 mb-2">
+                        Contraseña
+                    </label>
+                    <div class="relative">
+                        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                        </svg>
+                        <input type="password"
+                               name="password"
+                               id="id_password"
+                               placeholder="••••••••"
+                               required
+                               class="w-full pl-10 pr-4 py-3 rounded-lg
+                                      bg-base-900 border border-base-600
+                                      text-white placeholder-slate-500
+                                      focus:border-accent-blue focus:ring-2 focus:ring-accent-blue/20
+                                      outline-none transition-all">
+                    </div>
+                </div>
+
+                <!-- Botón -->
+                <button type="submit"
+                        class="w-full py-3 rounded-lg
+                               bg-gradient-to-r from-accent-blue to-accent-purple
+                               hover:from-sky-500 hover:to-violet-500
+                               text-white font-medium
+                               shadow-lg shadow-sky-500/25
+                               transition-all transform hover:scale-[1.01] active:scale-[0.99]">
+                    Iniciar sesión
+                </button>
+            </form>
+
+            <!-- Info -->
+            <div class="mt-6 pt-6 border-t border-base-600/50 text-center">
+                <p class="text-xs text-slate-500">
+                    ¿Problemas para acceder? Contacta al administrador
+                </p>
             </div>
-        {% endif %}
+        </div>
 
-        <form method="post" action="{% url 'login' %}">
-            {% csrf_token %}
-
-            <div class="field">
-                <label for="id_username">Usuario</label>
-                <input type="text" name="username" id="id_username"
-                       placeholder="Tu nombre de usuario" autofocus required>
-            </div>
-
-            <div class="field">
-                <label for="id_password">Contraseña</label>
-                <input type="password" name="password" id="id_password"
-                       placeholder="Tu contraseña" required>
-            </div>
-
-            <button type="submit" class="btn-login">Iniciar sesión</button>
-        </form>
-
-        <div class="footer">
-            Universidad Politécnica Estatal del Carchi
+        <!-- Footer -->
+        <div class="mt-6 text-center text-xs text-slate-500">
+            Universidad Politécnica Estatal del Carchi · {% now "Y" %}
         </div>
     </div>
+</div>
+
 </body>
 </html>
