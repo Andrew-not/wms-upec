@@ -1,3 +1,178 @@
+class Marca(models.Model):
+    nombre = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.nombre
+
+
+class Categoria(models.Model):
+    nombre = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.nombre
+
+
+class UnidadMedida(models.Model):
+    nombre = models.CharField(max_length=50)
+    abreviatura = models.CharField(max_length=10)
+
+    def __str__(self):
+        return self.nombre
+
+
+class Proveedor(models.Model):
+    nombre = models.CharField(max_length=150)
+
+    def __str__(self):
+        return self.nombre
+
+
+class Producto(models.Model):
+    CLASIFICACION_ABC_CHOICES = [
+        ('A', 'Clase A'),
+        ('B', 'Clase B'),
+        ('C', 'Clase C'),
+    ]
+
+    sku = models.CharField(max_length=50, unique=True)
+    nombre = models.CharField(max_length=200)
+    marca = models.ForeignKey(Marca, on_delete=models.CASCADE, related_name='productos')
+    categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, related_name='productos')
+    unidad_medida = models.ForeignKey(UnidadMedida, on_delete=models.CASCADE, related_name='productos')
+    proveedor = models.ForeignKey(Proveedor, on_delete=models.CASCADE, related_name='productos')
+
+    # Campos adicionales
+    codigo_barras = models.CharField(max_length=50, blank=True, db_index=True)
+    imagen = models.ImageField(upload_to='productos/', blank=True, null=True)
+    peso_kg = models.DecimalField(max_digits=6, decimal_places=3, default=0)
+    clasificacion_abc = models.CharField(max_length=1, choices=CLASIFICACION_ABC_CHOICES, default='C')
+
+    def __str__(self):
+        return f"{self.sku} - {self.nombre}"
+
+
+class ProductoResource(resources.ModelResource):
+    marca = fields.Field(
+        column_name='marca',
+        attribute='marca',
+        widget=ForeignKeyWidget(Marca, 'nombre')
+    )
+    categoria = fields.Field(
+        column_name='categoria',
+        attribute='categoria',
+        widget=ForeignKeyWidget(Categoria, 'nombre')
+    )
+    unidad_medida = fields.Field(
+        column_name='unidad_medida',
+        attribute='unidad_medida',
+        widget=ForeignKeyWidget(UnidadMedida, 'nombre')
+    )
+    proveedor = fields.Field(
+        column_name='proveedor',
+        attribute='proveedor',
+        widget=ForeignKeyWidget(Proveedor, 'nombre')
+    )
+
+    class Meta:
+        model = Producto
+        import_id_fields = ('sku',)
+        fields = (
+            'sku',
+            'nombre',
+            'codigo_barras',
+            'imagen',
+            'peso_kg',
+            'clasificacion_abc',
+            'marca',
+            'categoria',
+            'unidad_medida',
+            'proveedor',
+        )
+        export_order = fields
+
+@admin.register(Producto)
+class ProductoAdmin(ImportExportModelAdmin):
+    resource_class = ProductoResource
+    list_display = ('sku', 'nombre', 'codigo_barras', 'clasificacion_abc', 'peso_kg')
+    search_fields = ('sku', 'nombre', 'codigo_barras')
+    list_filter = ('clasificacion_abc', 'categoria', 'marca')
+
+
+admin.site.register(Marca)
+admin.site.register(Categoria)
+admin.site.register(UnidadMedida)
+admin.site.register(Proveedor)
+
+
+TEMPLATE_PRODUCTO_DETALLE = """
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Detalle de Producto</h2>
+    <hr>
+    <div class="row">
+        <div class="col-md-4">
+            {% if producto.imagen %}
+                <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" class="img-fluid border rounded">
+            {% else %}
+                <div class="p-5 text-center bg-light border rounded">Sin Imagen</div>
+            {% endif %}
+        </div>
+        <div class="col-md-8">
+            <p><strong>SKU:</strong> {{ producto.sku }}</p>
+            <p><strong>Nombre:</strong> {{ producto.nombre }}</p>
+            <p><strong>Código de Barras:</strong> {{ producto.codigo_barras|default:"N/A" }}</p>
+            <p><strong>Peso (kg):</strong> {{ producto.peso_kg }}</p>
+            <p><strong>Clasificación ABC:</strong> {{ producto.get_clasificacion_abc_display }}</p>
+            <p><strong>Categoría:</strong> {{ producto.categoria }}</p>
+            <p><strong>Marca:</strong> {{ producto.marca }}</p>
+            <p><strong>Unidad de Medida:</strong> {{ producto.unidad_medida }}</p>
+            <p><strong>Proveedor:</strong> {{ producto.proveedor }}</p>
+            <div class="mt-3">
+                <a href="{% url 'catalogo:producto_barcode' producto.sku %}" class="btn btn-secondary" target="_blank">
+                    Ver Etiqueta de Código de Barras
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+"""
+
+TEMPLATE_PRODUCTO_BARCODE = """
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Código de Barras - {{ producto.sku }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+        .etiqueta-box { border: 1px dashed #000; display: inline-block; padding: 15px; margin-top: 20px; }
+        .img-barcode { max-width: 100%; height: auto; }
+        .datos { margin-top: 10px; font-size: 14px; }
+        @media print {
+            .no-print { display: none; }
+            .etiqueta-box { border: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="no-print">
+        <button onclick="window.print()">Imprimir Etiqueta</button>
+    </div>
+    <div class="etiqueta-box">
+        <h3>{{ producto.nombre }}</h3>
+        <img class="img-barcode" src="{% url 'catalogo:producto_barcode' producto.sku %}?format=png" alt="Barcode {{ producto.sku }}">
+        <div class="datos">
+            <p><strong>SKU:</strong> {{ producto.sku }} | <strong>ABC:</strong> {{ producto.clasificacion_abc }} | <strong>Peso:</strong> {{ producto.peso_kg }} kg</p>
+        </div>
+    </div>
+</body>
+</html>
+"""
+
+TEMPLATE_DASHBOARD = """
 {% extends 'base.html' %}
 
 {% block title %}Dashboard · TechStock{% endblock %}
@@ -166,3 +341,56 @@
 </article>
 
 {% endblock %}
+"""
+
+def dashboard_view(request):
+    """Vista para renderizar el Dashboard base con los datos del catálogo."""
+    total_prod = Producto.objects.count()
+    context = {
+        'total_productos': total_prod,
+        'total_ubicaciones': 0,
+        'stock_total': 0,
+        'bajo_stock': 0,
+        'movimientos_hoy': 0,
+        'ultimos_movimientos': [],
+    }
+    t = Template(TEMPLATE_DASHBOARD)
+    return HttpResponse(t.render(Context(context)))
+
+
+def producto_detalle(request, sku):
+    """Muestra la ficha técnica detallada de un producto."""
+    producto = get_object_or_404(Producto, sku=sku)
+    t = Template(TEMPLATE_PRODUCTO_DETALLE)
+    return HttpResponse(t.render(Context({'producto': producto, 'request': request})))
+
+
+def producto_barcode(request, sku):
+    """Genera la imagen PNG del código de barras o muestra la vista de impresión."""
+    producto = get_object_or_404(Producto, sku=sku)
+    
+    # Si se pasa ?format=png, genera y devuelve el binario de la imagen
+    if request.GET.get('format') == 'png':
+        valor_codigo = producto.codigo_barras or producto.sku
+        try:
+            CODE128 = barcode.get_barcode_class('code128')
+            codigo_obj = CODE128(valor_codigo, writer=ImageWriter())
+            buffer = io.BytesIO()
+            codigo_obj.write(buffer)
+            buffer.seek(0)
+            return HttpResponse(buffer.getvalue(), content_type='image/png')
+        except Exception as e:
+            raise Http404(f"Error al generar código: {e}")
+            
+    # Si no tiene parámetro, renderiza la etiqueta HTML imprimible
+    t = Template(TEMPLATE_PRODUCTO_BARCODE)
+    return HttpResponse(t.render(Context({'producto': producto, 'request': request})))
+
+
+app_name = 'catalogo'
+
+urlpatterns = [
+    path('', dashboard_view, name='dashboard'),
+    path('producto/<str:sku>/', producto_detalle, name='producto_detalle'),
+    path('producto/<str:sku>/barcode/', producto_barcode, name='producto_barcode'),
+]
