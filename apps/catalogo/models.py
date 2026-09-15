@@ -5,7 +5,6 @@ from django.core.validators import MinValueValidator
 class Categoria(models.Model):
     """
     Clasificación de productos tecnológicos.
-    Ej: Smartphone, Tablet, Laptop, Wearable, Accesorio.
     """
     nombre = models.CharField('Nombre', max_length=100, unique=True)
     descripcion = models.TextField('Descripción', blank=True)
@@ -24,7 +23,6 @@ class Categoria(models.Model):
 class Marca(models.Model):
     """
     Fabricante del dispositivo.
-    Ej: Apple, Samsung, Xiaomi, Huawei, Lenovo, Motorola.
     """
     nombre = models.CharField('Nombre', max_length=100, unique=True)
     pais_origen = models.CharField('País de origen', max_length=100, blank=True)
@@ -38,10 +36,10 @@ class Marca(models.Model):
     def __str__(self):
         return self.nombre
 
+
 class UnidadMedida(models.Model):
     """
     Unidad de medida para los productos.
-    Ej: Unidad, Caja, Pack x10, Display.
     """
     nombre = models.CharField('Nombre', max_length=50, unique=True)
     abreviatura = models.CharField(
@@ -70,7 +68,7 @@ class Proveedor(models.Model):
         ('CED', 'Cédula'),
         ('PAS', 'Pasaporte'),
     )
-    
+
     tipo_documento = models.CharField(
         'Tipo de documento',
         max_length=3,
@@ -83,11 +81,7 @@ class Proveedor(models.Model):
         unique=True
     )
     razon_social = models.CharField('Razón social', max_length=200)
-    nombre_comercial = models.CharField(
-        'Nombre comercial',
-        max_length=200,
-        blank=True
-    )
+    nombre_comercial = models.CharField('Nombre comercial', max_length=200, blank=True)
     contacto = models.CharField('Persona de contacto', max_length=150, blank=True)
     telefono = models.CharField('Teléfono', max_length=20, blank=True)
     email = models.EmailField('Email', blank=True)
@@ -105,16 +99,23 @@ class Proveedor(models.Model):
     def __str__(self):
         return f'{self.razon_social} ({self.numero_documento})'
 
+
 class Producto(models.Model):
     """
     Modelo de dispositivo. Representa el SKU del catálogo.
-    Ej: iPhone 15, Galaxy S23, Redmi Note 13.
     """
     sku = models.CharField(
         'SKU',
         max_length=50,
         unique=True,
         help_text='Código único del producto. Ej: APL-IP15-128'
+    )
+    codigo_barras = models.CharField(
+        'Código de barras',
+        max_length=50,
+        blank=True,
+        db_index=True,
+        help_text='EAN-13, UPC, etc.'
     )
     nombre = models.CharField('Nombre del modelo', max_length=200)
     marca = models.ForeignKey(
@@ -150,6 +151,19 @@ class Producto(models.Model):
         blank=True,
         help_text='RAM, almacenamiento, procesador, pantalla, batería, SO'
     )
+    imagen = models.ImageField(
+        'Imagen del producto',
+        upload_to='productos/',
+        blank=True,
+        null=True
+    )
+    peso_kg = models.DecimalField(
+        'Peso (kg)',
+        max_digits=6,
+        decimal_places=3,
+        default=0,
+        validators=[MinValueValidator(0)]
+    )
     precio_venta = models.DecimalField(
         'Precio de venta',
         max_digits=10,
@@ -166,6 +180,16 @@ class Producto(models.Model):
         'Stock máximo',
         default=100
     )
+    clasificacion_abc = models.CharField(
+        'Clasificación ABC',
+        max_length=1,
+        choices=[
+            ('A', 'A - Alta rotación'),
+            ('B', 'B - Media rotación'),
+            ('C', 'C - Baja rotación'),
+        ],
+        default='C'
+    )
     controla_imei = models.BooleanField(
         'Controla IMEI/Serial',
         default=True,
@@ -181,6 +205,7 @@ class Producto(models.Model):
         ordering = ['marca__nombre', 'nombre']
         indexes = [
             models.Index(fields=['sku']),
+            models.Index(fields=['codigo_barras']),
             models.Index(fields=['marca', 'categoria']),
         ]
 
@@ -189,12 +214,10 @@ class Producto(models.Model):
 
     @property
     def stock_actual(self):
-        """Stock total sumando todas las existencias."""
         from django.db.models import Sum
         total = self.existencias.aggregate(total=Sum('cantidad'))['total']
         return total or 0
 
     @property
     def bajo_stock(self):
-        """True si el stock actual está por debajo del mínimo."""
         return self.stock_actual < self.stock_minimo

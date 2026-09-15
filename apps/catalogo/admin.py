@@ -1,18 +1,18 @@
 from django.contrib import admin
 from import_export import resources
 from import_export.admin import ImportExportModelAdmin
-from .models import (
-    Categoria, Marca, UnidadMedida, Proveedor, Producto
-)
+from .models import Categoria, Marca, UnidadMedida, Proveedor, Producto
 
 
 class ProductoResource(resources.ModelResource):
     class Meta:
         model = Producto
         fields = (
-            'sku', 'nombre', 'marca', 'categoria',
-            'precio_venta', 'stock_minimo', 'stock_maximo', 'activo'
+            'sku', 'codigo_barras', 'nombre', 'marca', 'categoria',
+            'precio_venta', 'stock_minimo', 'stock_maximo',
+            'peso_kg', 'clasificacion_abc', 'activo'
         )
+        export_order = fields
 
 
 @admin.register(Categoria)
@@ -40,37 +40,33 @@ class UnidadMedidaAdmin(admin.ModelAdmin):
 
 @admin.register(Proveedor)
 class ProveedorAdmin(admin.ModelAdmin):
-    list_display = (
-        'razon_social', 'numero_documento', 'telefono',
-        'email', 'ciudad', 'activo'
-    )
+    list_display = ('razon_social', 'numero_documento', 'telefono',
+                    'email', 'ciudad', 'activo')
     list_filter = ('activo', 'ciudad', 'tipo_documento')
-    search_fields = (
-        'razon_social', 'nombre_comercial',
-        'numero_documento', 'email'
-    )
+    search_fields = ('razon_social', 'nombre_comercial',
+                     'numero_documento', 'email')
 
 
 @admin.register(Producto)
 class ProductoAdmin(ImportExportModelAdmin):
     resource_class = ProductoResource
-    list_display = (
-        'sku', 'nombre', 'marca', 'categoria',
-        'precio_venta', 'stock_actual', 'bajo_stock', 'activo'
-    )
-    list_filter = ('marca', 'categoria', 'activo', 'controla_imei')
-    search_fields = ('sku', 'nombre', 'especificaciones')
+    list_display = ('sku', 'codigo_barras', 'nombre', 'marca', 'categoria',
+                    'precio_venta', 'stock_actual', 'bajo_stock',
+                    'clasificacion_abc', 'activo')
+    list_filter = ('marca', 'categoria', 'clasificacion_abc',
+                   'activo', 'controla_imei')
+    search_fields = ('sku', 'codigo_barras', 'nombre', 'especificaciones')
     list_select_related = ('marca', 'categoria')
     readonly_fields = ('fecha_creacion', 'fecha_actualizacion')
     fieldsets = (
         ('Identificación', {
-            'fields': ('sku', 'nombre', 'marca', 'categoria')
+            'fields': ('sku', 'codigo_barras', 'nombre', 'marca', 'categoria')
         }),
         ('Clasificación', {
-            'fields': ('unidad_medida', 'proveedor')
+            'fields': ('unidad_medida', 'proveedor', 'clasificacion_abc')
         }),
         ('Especificaciones', {
-            'fields': ('especificaciones', 'controla_imei')
+            'fields': ('especificaciones', 'imagen', 'peso_kg', 'controla_imei')
         }),
         ('Inventario', {
             'fields': ('precio_venta', 'stock_minimo', 'stock_maximo')
