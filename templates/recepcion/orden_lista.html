@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+
+{% block title %}Recepción · TechStock{% endblock %}
+
+{% block content %}
+
+<div class="flex justify-between items-end mb-6">
+    <div>
+        <p class="text-sm text-slate-500 dark:text-slate-400 mb-1">Inicio › Recepción</p>
+        <h1 class="font-display text-3xl font-bold text-slate-900 dark:text-white">Órdenes de Recepción</h1>
+        <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">Recepción de mercadería de proveedores</p>
+    </div>
+    <a href="/admin/recepcion/ordenrecepcion/add/" target="_blank"
+       class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-accent-blue hover:bg-sky-600 text-white text-sm font-medium shadow-lg shadow-sky-500/20 transition-all">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+        </svg>
+        Nueva orden
+    </a>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <article class="bg-white dark:bg-base-800 border border-slate-200 dark:border-base-600/50 rounded-2xl p-5">
+        <div class="flex justify-between items-center mb-3">
+            <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">Pendientes</span>
+            <div class="w-9 h-9 rounded-lg bg-amber-500/10 flex items-center justify-center">
+                <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+        </div>
+        <div class="font-display text-3xl font-bold text-slate-900 dark:text-white">{{ total_pendientes }}</div>
+    </article>
+    <article class="bg-white dark:bg-base-800 border border-slate-200 dark:border-base-600/50 rounded-2xl p-5">
+        <div class="flex justify-between items-center mb-3">
+            <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">En proceso</span>
+            <div class="w-9 h-9 rounded-lg bg-sky-500/10 flex items-center justify-center">
+                <svg class="w-4 h-4 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                </svg>
+            </div>
+        </div>
+        <div class="font-display text-3xl font-bold text-slate-900 dark:text-white">{{ total_en_proceso }}</div>
+    </article>
+    <article class="bg-white dark:bg-base-800 border border-slate-200 dark:border-base-600/50 rounded-2xl p-5">
+        <div class="flex justify-between items-center mb-3">
+            <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">Recibidas</span>
+            <div class="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                </svg>
+            </div>
+        </div>
+        <div class="font-display text-3xl font-bold text-slate-900 dark:text-white">{{ total_recibidas }}</div>
+    </article>
+</div>
+
+<div class="bg-white dark:bg-base-800 border border-slate-200 dark:border-base-600/50 rounded-2xl p-5 mb-6">
+    <form method="get" class="flex flex-wrap items-center gap-3">
+        <input type="text" name="q" value="{{ filtros.q }}" placeholder="Buscar orden, proveedor..."
+               class="flex-1 min-w-[200px] px-3 py-2.5 rounded-lg text-sm bg-slate-50 dark:bg-base-900 border border-slate-200 dark:border-base-600 text-slate-900 dark:text-slate-100 focus:border-accent-blue focus:ring-2 focus:ring-accent-blue/20 outline-none transition-all">
+        <select name="estado" class="px-3 py-2.5 rounded-lg text-sm bg-slate-50 dark:bg-base-900 border border-slate-200 dark:border-base-600 text-slate-900 dark:text-slate-100">
+            <option value="">Todos los estados</option>
+            <option value="PENDIENTE" {% if filtros.estado == 'PENDIENTE' %}selected{% endif %}>Pendiente</option>
+            <option value="EN_PROCESO" {% if filtros.estado == 'EN_PROCESO' %}selected{% endif %}>En proceso</option>
+            <option value="RECIBIDA" {% if filtros.estado == 'RECIBIDA' %}selected{% endif %}>Recibida</option>
+            <option value="CANCELADA" {% if filtros.estado == 'CANCELADA' %}selected{% endif %}>Cancelada</option>
+        </select>
+        <button type="submit" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-accent-blue hover:bg-sky-600 text-white shadow-lg shadow-sky-500/20 transition-all">
+            Buscar
+        </button>
+        <a href="{% url 'recepcion:orden_lista' %}" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-slate-100 dark:bg-base-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-base-600 transition-colors">
+            Limpiar
+        </a>
+    </form>
+</div>
+
+<div class="bg-white dark:bg-base-800 border border-slate-200 dark:border-base-600/50 rounded-2xl overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead class="bg-slate-50 dark:bg-base-900/50">
+                <tr>
+                    <th class="text-left py-3 px-4 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">N° Orden</th>
+                    <th class="text-left py-3 px-4 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">Proveedor</th>
+                    <th class="text-left py-3 px-4 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">Fecha esperada</th>
+                    <th class="text-left py-3 px-4 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">Estado</th>
+                    <th class="text-center py-3 px-4 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">Líneas</th>
+                    <th class="text-center py-3 px-4 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">Recepción</th>
+                    <th class="text-right py-3 px-4 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for orden in page_obj %}
+                <tr class="border-b border-slate-100 dark:border-base-600/30 hover:bg-slate-50 dark:hover:bg-base-700/30 transition-colors">
+                    <td class="py-3 px-4 font-mono font-semibold text-slate-900 dark:text-white">{{ orden.numero }}</td>
+                    <td class="py-3 px-4 text-slate-700 dark:text-slate-300">{{ orden.proveedor.razon_social }}</td>
+                    <td class="py-3 px-4 text-slate-600 dark:text-slate-300">{{ orden.fecha_esperada|date:"d/m/Y" }}</td>
+                    <td class="py-3 px-4">
+                        {% if orden.estado == 'PENDIENTE' %}
+                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">Pendiente</span>
+                        {% elif orden.estado == 'EN_PROCESO' %}
+                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-medium bg-sky-500/10 text-sky-400 border border-sky-500/20">En proceso</span>
+                        {% elif orden.estado == 'RECIBIDA' %}
+                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Recibida</span>
+                        {% else %}
+                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-medium bg-red-500/10 text-red-400 border border-red-500/20">Cancelada</span>
+                        {% endif %}
+                    </td>
+                    <td class="py-3 px-4 text-center text-slate-700 dark:text-slate-300">{{ orden.total_lineas }}</td>
+                    <td class="py-3 px-4 text-center">
+                        <div class="flex items-center justify-center gap-2">
+                            <span class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ orden.porcentaje_recepcion }}%</span>
+                            <div class="w-16 h-1.5 rounded-full bg-slate-200 dark:bg-base-700 overflow-hidden">
+                                <div class="h-full rounded-full bg-emerald-500" style="width: {{ orden.porcentaje_recepcion }}%"></div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="py-3 px-4 text-right">
+                        <a href="{% url 'recepcion:orden_detalle' orden.numero %}"
+                           class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium
+                                  bg-slate-100 dark:bg-base-700 text-slate-700 dark:text-slate-300
+                                  hover:bg-slate-200 dark:hover:bg-base-600 transition-colors">
+                            Ver
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="py-12 text-center text-slate-500 dark:text-slate-400">
+                        No hay órdenes de recepción registradas.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if page_obj.has_other_pages %}
+    <div class="flex items-center justify-between px-5 py-4 border-t border-slate-200 dark:border-base-600/50">
+        <div class="text-xs text-slate-500 dark:text-slate-400">
+            Mostrando {{ page_obj.start_index }}–{{ page_obj.end_index }} de {{ page_obj.paginator.count }}
+        </div>
+        <div class="flex items-center gap-1">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}{% if filtros.q %}&q={{ filtros.q }}{% endif %}{% if filtros.estado %}&estado={{ filtros.estado }}{% endif %}" class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-slate-100 dark:bg-base-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-base-600 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+                </a>
+            {% endif %}
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <span class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-accent-blue text-white font-medium text-sm">{{ num }}</span>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <a href="?page={{ num }}{% if filtros.q %}&q={{ filtros.q }}{% endif %}{% if filtros.estado %}&estado={{ filtros.estado }}{% endif %}" class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-slate-100 dark:bg-base-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-base-600 transition-colors text-sm">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if filtros.q %}&q={{ filtros.q }}{% endif %}{% if filtros.estado %}&estado={{ filtros.estado }}{% endif %}" class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-slate-100 dark:bg-base-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-base-600 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                </a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

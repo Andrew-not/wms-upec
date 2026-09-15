@@ -10,6 +10,7 @@ urlpatterns = [
     path('catalogo/', include('apps.catalogo.urls')),
     path('almacen/', include('apps.almacen.urls')),
     path('inventario/', include('apps.inventario.urls')),
+    path('recepcion/', include('apps.recepcion.urls')),
 
     path('login/', auth_views.LoginView.as_view(
         template_name='registration/login.html'
