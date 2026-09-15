@@ -3,6 +3,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
+from django.views.defaults import permission_denied
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -20,6 +21,9 @@ urlpatterns = [
         next_page='login'
     ), name='logout'),
 ]
+
+# Handler personalizado para 403
+handler403 = 'apps.core.views.error_403'
 
 if settings.DEBUG:
     import debug_toolbar

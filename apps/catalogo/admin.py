@@ -15,8 +15,33 @@ class ProductoResource(resources.ModelResource):
         export_order = fields
 
 
+class ModuloAdminMixin:
+    """
+    Solo usuarios de este modulo (o superusuarios) pueden ver/modificar.
+    """
+    modulo = None
+
+    def has_module_permission(self, request):
+        if request.user.is_superuser:
+            return True
+        return request.user.groups.filter(name=f'Operario {self.modulo}').exists()
+
+    def has_view_permission(self, request, obj=None):
+        return self.has_module_permission(request)
+
+    def has_add_permission(self, request):
+        return self.has_module_permission(request)
+
+    def has_change_permission(self, request, obj=None):
+        return self.has_module_permission(request)
+
+    def has_delete_permission(self, request, obj=None):
+        return request.user.is_superuser
+
+
 @admin.register(Categoria)
-class CategoriaAdmin(admin.ModelAdmin):
+class CategoriaAdmin(ModuloAdminMixin, admin.ModelAdmin):
+    modulo = 'Catalogo'
     list_display = ('nombre', 'activo', 'fecha_creacion')
     list_filter = ('activo',)
     search_fields = ('nombre',)
@@ -24,7 +49,8 @@ class CategoriaAdmin(admin.ModelAdmin):
 
 
 @admin.register(Marca)
-class MarcaAdmin(admin.ModelAdmin):
+class MarcaAdmin(ModuloAdminMixin, admin.ModelAdmin):
+    modulo = 'Catalogo'
     list_display = ('nombre', 'pais_origen', 'activo')
     list_filter = ('activo',)
     search_fields = ('nombre',)
@@ -32,14 +58,16 @@ class MarcaAdmin(admin.ModelAdmin):
 
 
 @admin.register(UnidadMedida)
-class UnidadMedidaAdmin(admin.ModelAdmin):
+class UnidadMedidaAdmin(ModuloAdminMixin, admin.ModelAdmin):
+    modulo = 'Catalogo'
     list_display = ('nombre', 'abreviatura', 'activo')
     list_filter = ('activo',)
     search_fields = ('nombre', 'abreviatura')
 
 
 @admin.register(Proveedor)
-class ProveedorAdmin(admin.ModelAdmin):
+class ProveedorAdmin(ModuloAdminMixin, admin.ModelAdmin):
+    modulo = 'Catalogo'
     list_display = ('razon_social', 'numero_documento', 'telefono',
                     'email', 'ciudad', 'activo')
     list_filter = ('activo', 'ciudad', 'tipo_documento')
@@ -48,7 +76,8 @@ class ProveedorAdmin(admin.ModelAdmin):
 
 
 @admin.register(Producto)
-class ProductoAdmin(ImportExportModelAdmin):
+class ProductoAdmin(ModuloAdminMixin, ImportExportModelAdmin):
+    modulo = 'Catalogo'
     resource_class = ProductoResource
     list_display = ('sku', 'codigo_barras', 'nombre', 'marca', 'categoria',
                     'precio_venta', 'stock_actual', 'bajo_stock',

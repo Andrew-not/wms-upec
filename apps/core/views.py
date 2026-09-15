@@ -28,4 +28,12 @@ def home(request):
         'movimientos_hoy': movimientos_hoy,
         'ultimos_movimientos': ultimos_movimientos,
     }
+
     return render(request, 'core/home.html', context)
+
+
+def error_403(request, exception=None):
+    """
+    Vista personalizada para error 403 (Sin acceso).
+    """
+    return render(request, '403.html', status=403)
