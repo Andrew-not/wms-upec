@@ -1,4 +1,4 @@
-﻿from django.shortcuts import render
+﻿from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Sum, Q
@@ -11,12 +11,10 @@ def ubicacion_lista(request):
     """
     from apps.almacen.models import Ubicacion, Zona, Bodega
 
-    # Queryset base
     ubicaciones = Ubicacion.objects.filter(activo=True).select_related(
         'zona', 'zona__bodega'
     ).order_by('codigo')
 
-    # Filtros
     q = request.GET.get('q', '').strip()
     bodega_id = request.GET.get('bodega', '')
     zona_id = request.GET.get('zona', '')
@@ -36,7 +34,6 @@ def ubicacion_lista(request):
     if zona_id:
         ubicaciones = ubicaciones.filter(zona_id=zona_id)
 
-    # Calcular ocupación para cada ubicación
     ubicaciones_con_datos = []
     for ubi in ubicaciones:
         ocupacion = ubi.ocupacion_actual
@@ -49,7 +46,6 @@ def ubicacion_lista(request):
             'disponible': disponible,
         })
 
-    # Filtrar por estado (después de calcular porcentajes)
     if estado:
         if estado == 'vacia':
             ubicaciones_con_datos = [u for u in ubicaciones_con_datos if u['porcentaje'] == 0]
@@ -60,28 +56,22 @@ def ubicacion_lista(request):
         elif estado == 'llena':
             ubicaciones_con_datos = [u for u in ubicaciones_con_datos if u['porcentaje'] >= 90]
 
-    # Paginación
     paginator = Paginator(ubicaciones_con_datos, 12)
     page_number = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_number)
 
-    # Opciones para filtros
     bodegas = Bodega.objects.filter(activo=True).order_by('codigo')
     zonas = Zona.objects.filter(activo=True).select_related('bodega').order_by('bodega__codigo', 'codigo')
 
-    # KPIs
     total_ubicaciones = Ubicacion.objects.filter(activo=True).count()
     capacidad_total = Ubicacion.objects.filter(activo=True).aggregate(
         total=Sum('capacidad_maxima')
     )['total'] or 0
-    ocupacion_total = Sum(['x' for x in []] or [0])  # placeholder
 
-    # Cálculo de ocupación total
     from apps.inventario.models import Existencia
     ocupacion_total = Existencia.objects.aggregate(total=Sum('cantidad'))['total'] or 0
     porcentaje_global = round((ocupacion_total / capacidad_total) * 100, 1) if capacidad_total > 0 else 0
 
-    # Ubicaciones llenas (>=90%)
     ubicaciones_llenas = sum(
         1 for u in Ubicacion.objects.filter(activo=True)
         if u.porcentaje_ocupacion >= 90
@@ -105,3 +95,58 @@ def ubicacion_lista(request):
     }
 
     return render(request, 'almacen/ubicacion_lista.html', context)
+
+
+@login_required
+def ubicacion_detalle(request, codigo):
+    """
+    Detalle de una ubicación específica.
+    """
+    from apps.almacen.models import Ubicacion, MovimientoUbicacion
+    from apps.inventario.models import Existencia
+
+    ubicacion = get_object_or_404(Ubicacion, codigo=codigo)
+
+    existencias = Existencia.objects.filter(
+        ubicacion=ubicacion,
+        cantidad__gt=0
+    ).select_related('producto')
+
+    movimientos = MovimientoUbicacion.objects.filter(
+        ubicacion=ubicacion
+    ).select_related('producto', 'usuario').order_by('-fecha')[:20]
+
+    context = {
+        'ubicacion': ubicacion,
+        'existencias': existencias,
+        'movimientos': movimientos,
+    }
+
+    return render(request, 'almacen/ubicacion_detalle.html', context)
+
+
+@login_required
+def mapa_almacen(request, bodega_id=None):
+    """
+    Mapa visual del almacén.
+    """
+    from apps.almacen.models import Ubicacion, Zona, Bodega
+
+    bodegas = Bodega.objects.filter(activo=True).order_by('codigo')
+
+    if bodega_id:
+        bodega = get_object_or_404(Bodega, id=bodega_id)
+    else:
+        bodega = bodegas.first()
+
+    zonas = []
+    if bodega:
+        zonas = Zona.objects.filter(bodega=bodega, activo=True).order_by('codigo')
+
+    context = {
+        'bodegas': bodegas,
+        'bodega': bodega,
+        'zonas': zonas,
+    }
+
+    return render(request, 'almacen/mapa_almacen.html', context)

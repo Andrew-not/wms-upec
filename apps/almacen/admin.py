@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Bodega, Zona, Ubicacion
+from .models import Bodega, Zona, Ubicacion, MovimientoUbicacion
 
 
 class ZonaInline(admin.TabularInline):
@@ -31,9 +31,18 @@ class ZonaAdmin(admin.ModelAdmin):
 
 @admin.register(Ubicacion)
 class UbicacionAdmin(admin.ModelAdmin):
-    list_display = ('codigo', 'zona', 'capacidad_maxima',
+    list_display = ('codigo', 'zona', 'tipo_ubicacion', 'capacidad_maxima',
                     'ocupacion_actual', 'porcentaje_ocupacion', 'activo')
-    list_filter = ('zona__bodega', 'zona', 'activo')
+    list_filter = ('zona__bodega', 'zona', 'tipo_ubicacion', 'activo')
     search_fields = ('codigo', 'pasillo', 'rack', 'nivel')
     list_select_related = ('zona', 'zona__bodega')
     readonly_fields = ('ocupacion_actual', 'porcentaje_ocupacion')
+
+
+@admin.register(MovimientoUbicacion)
+class MovimientoUbicacionAdmin(admin.ModelAdmin):
+    list_display = ('fecha', 'tipo', 'ubicacion', 'producto', 'cantidad', 'usuario')
+    list_filter = ('tipo', 'fecha', 'ubicacion__zona__bodega')
+    search_fields = ('producto__sku', 'ubicacion__codigo')
+    list_select_related = ('ubicacion', 'producto', 'usuario')
+    readonly_fields = ('fecha',)
