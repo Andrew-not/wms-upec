@@ -48,4 +48,7 @@ class Usuario(AbstractUser):
         ordering = ['-date_joined']
     
     def __str__(self):
-        return f"{self.get_full_name()} - {self.get_rol_display()}"
+        nombre = self.get_full_name().strip()
+        if nombre:
+            return f"{nombre} ({self.username}) - {self.get_rol_display()}"
+        return f"{self.username} - {self.get_rol_display()}"

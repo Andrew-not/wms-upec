@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}Sin acceso · TechStock{% endblock %}
+
+{% block content %}
+
+<div class="flex items-center justify-center min-h-[70vh]">
+    <div class="max-w-lg w-full text-center">
+
+        <div class="w-24 h-24 mx-auto mb-6 rounded-3xl bg-red-500/10 border border-red-500/30 flex items-center justify-center">
+            <svg class="w-12 h-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+        </div>
+
+        <h1 class="font-display text-4xl font-bold text-red-500 mb-3">
+            Sin acceso
+        </h1>
+
+        <p class="text-slate-400 text-lg mb-2">
+            No tienes permiso para acceder a este módulo.
+        </p>
+
+        <p class="text-slate-500 text-sm mb-8">
+            Tu rol es <strong class="text-brand-400">{{ request.user.get_rol_display }}</strong>.
+            Solo puedes acceder al módulo asignado a tu usuario.
+        </p>
+
+        <div class="bg-dark-800 border border-dark-600 rounded-2xl p-5 mb-8 text-left">
+            <p class="text-xs uppercase tracking-wider text-slate-500 mb-3 font-semibold">
+                Módulos disponibles para ti
+            </p>
+            <div class="space-y-2">
+                {% if 'Operario Catalogo' in user.groups.all|stringformat:"s" or user.is_superuser %}
+                    <a href="/admin/catalogo/" class="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-dark-700 hover:bg-dark-600 transition-colors">
+                        <span class="w-2 h-2 rounded-full bg-brand-500"></span>
+                        <span class="text-slate-200 text-sm font-medium">Catálogo</span>
+                    </a>
+                {% endif %}
+                {% if 'Operario Almacen' in user.groups.all|stringformat:"s" or user.is_superuser %}
+                    <a href="/admin/almacen/" class="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-dark-700 hover:bg-dark-600 transition-colors">
+                        <span class="w-2 h-2 rounded-full bg-cyan-500"></span>
+                        <span class="text-slate-200 text-sm font-medium">Almacén</span>
+                    </a>
+                {% endif %}
+                {% if 'Operario Inventario' in user.groups.all|stringformat:"s" or user.is_superuser %}
+                    <a href="/admin/inventario/" class="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-dark-700 hover:bg-dark-600 transition-colors">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        <span class="text-slate-200 text-sm font-medium">Inventario</span>
+                    </a>
+                {% endif %}
+                {% if 'Operario Recepcion' in user.groups.all|stringformat:"s" or user.is_superuser %}
+                    <a href="/admin/recepcion/" class="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-dark-700 hover:bg-dark-600 transition-colors">
+                        <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                        <span class="text-slate-200 text-sm font-medium">Recepción</span>
+                    </a>
+                {% endif %}
+                {% if 'Operario Despacho' in user.groups.all|stringformat:"s" or user.is_superuser %}
+                    <a href="/admin/despacho/" class="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-dark-700 hover:bg-dark-600 transition-colors">
+                        <span class="w-2 h-2 rounded-full bg-violet-500"></span>
+                        <span class="text-slate-200 text-sm font-medium">Despacho</span>
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="flex items-center justify-center gap-3">
+            <a href="{% url 'core:home' %}"
+               class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-sm font-medium shadow-lg shadow-glow-orange transition-all">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                </svg>
+                Ir al Dashboard
+            </a>
+
+            <a href="{% url 'logout' %}"
+               class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-dark-700 hover:bg-dark-600 text-slate-300 text-sm font-medium border border-dark-600 transition-all">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                </svg>
+                Cerrar sesión
+            </a>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

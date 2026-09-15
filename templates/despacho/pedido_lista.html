@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block title %}Pedido {{ pedido.numero }} · Despacho{% endblock %}
+
+{% block content %}
+
+<div class="flex justify-between items-end mb-6">
+    <div>
+        <p class="text-sm text-slate-500 dark:text-slate-400 mb-1">
+            <a href="{% url 'despacho:pedido_lista' %}" class="hover:text-accent-blue">Despacho</a> › {{ pedido.numero }}
+        </p>
+        <h1 class="font-display text-3xl font-bold text-slate-900 dark:text-white font-mono">{{ pedido.numero }}</h1>
+        <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">{{ pedido.cliente.razon_social }}</p>
+    </div>
+    <div class="flex items-center gap-2">
+        {% if pedido.estado == 'PENDIENTE' or pedido.estado == 'PICKING' %}
+        <form method="post" action="{% url 'despacho:procesar_picking' pedido.numero %}" class="inline">
+            {% csrf_token %}
+            <input type="hidden" name="accion" value="picking">
+            <button type="submit" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-sky-500 hover:bg-sky-600 text-white text-sm font-medium shadow-lg shadow-sky-500/20 transition-all">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                </svg>
+                Procesar picking
+            </button>
+        </form>
+        {% endif %}
+
+        {% if pedido.estado == 'PREPARADO' %}
+        <form method="post" action="{% url 'despacho:procesar_picking' pedido.numero %}" class="inline">
+            {% csrf_token %}
+            <input type="hidden" name="accion" value="despachar">
+            <button type="submit" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium shadow-lg shadow-emerald-500/20 transition-all">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                </svg>
+                Despachar pedido
+            </button>
+        </form>
+        {% endif %}
+
+        <a href="{% url 'despacho:pedido_lista' %}" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-slate-100 dark:bg-base-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-base-600 transition-colors text-sm">
+            Volver
+        </a>
+    </div>
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="mb-4 px-4 py-3 rounded-lg text-sm {% if message.tags == 'success' %}bg-emerald-500/10 text-emerald-400 border border-emerald-500/20{% else %}bg-red-500/10 text-red-400 border border-red-500/20{% endif %}">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+    <article class="bg-white dark:bg-base-800 border border-slate-200 dark:border-base-600/50 rounded-2xl p-5">
+        <p class="text-xs text-slate-500 dark:text-slate-400 mb-1">Estado</p>
+        {% if pedido.estado == 'PENDIENTE' %}
+            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">Pendiente</span>
+        {% elif pedido.estado == 'PICKING' %}
+            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-sky-500/10 text-sky-400 border border-sky-500/20">En picking</span>
+        {% elif pedido.estado == 'PREPARADO' %}
+            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-violet-500/10 text-violet-400 border border-violet-500/20">Preparado</span>
+        {% elif pedido.estado == 'DESPACHADO' %}
+            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Despachado</span>
+        {% else %}
+            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-red-500/10 text-red-400 border border-red-500/20">Cancelado</span>
+        {% endif %}
+    </article>
+    <article class="bg-white dark:bg-base-800 border border-slate-200 dark:border-base-600/50 rounded-2xl p-5">
+        <p class="text-xs text-slate-500 dark:text-slate-400 mb-1">Prioridad</p>
+        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium
+                     {% if pedido.prioridad == 'URGENTE' %}bg-red-500/10 text-red-400
+                     {% elif pedido.prioridad == 'ALTA' %}bg-amber-500/10 text-amber-400
+                     {% elif pedido.prioridad == 'NORMAL' %}bg-sky-500/10 text-sky-400
+                     {% else %}bg-slate-500/10 text-slate-400{% endif %}">
+            {{ pedido.get_prioridad_display }}
+        </span>
+    </article>
+    <article class="bg-white dark:bg-base-800 border border-slate-200 dark:border-base-600/50 rounded-2xl p-5">
+        <p class="text-xs text-slate-500 dark:text-slate-400 mb-1">Total unidades</p>
+        <p class="font-display text-2xl font-bold text-slate-900 dark:text-white">{{ pedido.total_unidades }}</p>
+    </article>
+    <article class="bg-white dark:bg-base-800 border border-slate-200 dark:border-base-600/50 rounded-2xl p-5">
+        <p class="text-xs text-slate-500 dark:text-slate-400 mb-1">Total pedido</p>
+        <p class="font-display text-2xl font-bold text-slate-900 dark:text-white">${{ pedido.total_pedido|floatformat:2 }}</p>
+    </article>
+</div>
+
+<article class="bg-white dark:bg-base-800 border border-slate-200 dark:border-base-600/50 rounded-2xl p-5">
+    <h2 class="font-display text-lg font-bold text-slate-900 dark:text-white mb-4">Líneas del pedido</h2>
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-slate-200 dark:border-base-600/50">
+                    <th class="text-left py-3 px-3 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">Producto</th>
+                    <th class="text-right py-3 px-3 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">Cantidad</th>
+                    <th class="text-right py-3 px-3 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">Preparado</th>
+                    <th class="text-right py-3 px-3 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">Precio</th>
+                    <th class="text-right py-3 px-3 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">Subtotal</th>
+                    <th class="text-left py-3 px-3 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">Origen</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for linea in lineas %}
+                <tr class="border-b border-slate-100 dark:border-base-600/30">
+                    <td class="py-3 px-3">
+                        <strong class="text-slate-900 dark:text-white text-xs font-mono">{{ linea.producto.sku }}</strong><br>
+                        <small class="text-slate-500 dark:text-slate-400">{{ linea.producto.nombre }}</small>
+                    </td>
+                    <td class="py-3 px-3 text-right text-slate-700 dark:text-slate-300">{{ linea.cantidad }}</td>
+                    <td class="py-3 px-3 text-right font-bold text-slate-900 dark:text-white">{{ linea.cantidad_preparada }}</td>
+                    <td class="py-3 px-3 text-right text-slate-700 dark:text-slate-300">${{ linea.precio_unitario|floatformat:2 }}</td>
+                    <td class="py-3 px-3 text-right font-bold text-slate-900 dark:text-white">${{ linea.subtotal|floatformat:2 }}</td>
+                    <td class="py-3 px-3 text-slate-600 dark:text-slate-300 font-mono text-xs">{{ linea.ubicacion_origen.codigo|default:"—" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="py-8 text-center text-slate-500 dark:text-slate-400">No hay líneas en este pedido.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</article>
+
+{% endblock %}
