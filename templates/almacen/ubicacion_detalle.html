@@ -1,67 +1,120 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ ubicacion.codigo }} · Almacén{% endblock %}
+{% block title %}{{ ubicacion.codigo }} · Almacén · C.TECH{% endblock %}
 
 {% block content %}
 
-<div class="flex justify-between items-end mb-6">
+<div class="flex justify-between items-end mb-8">
     <div>
-        <p class="text-sm text-slate-500 dark:text-slate-400 mb-1">
-            <a href="{% url 'almacen:ubicacion_lista' %}" class="hover:text-accent-blue">Almacén</a> › {{ ubicacion.codigo }}
+        <p class="text-sm text-slate-500 mb-2">
+            <a href="{% url 'almacen:ubicacion_lista' %}" class="hover:text-brand-500">Almacén</a> › {{ ubicacion.codigo }}
         </p>
-        <h1 class="font-display text-3xl font-bold text-slate-900 dark:text-white font-mono">{{ ubicacion.codigo }}</h1>
-        <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">
+        <h1 class="font-display text-4xl font-bold text-white font-mono">{{ ubicacion.codigo }}</h1>
+        <p class="text-slate-400 text-sm mt-2">
             {{ ubicacion.zona.bodega.nombre }} · {{ ubicacion.zona.nombre }}
         </p>
     </div>
-    <a href="{% url 'almacen:ubicacion_lista' %}"
-       class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-slate-100 dark:bg-base-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-base-600 transition-colors text-sm">
+    <a href="{% url 'almacen:ubicacion_lista' %}" class="btn btn-secondary">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+        </svg>
         Volver
     </a>
 </div>
 
-<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-    <article class="bg-white dark:bg-base-800 border border-slate-200 dark:border-base-600/50 rounded-2xl p-5">
-        <p class="text-xs text-slate-500 dark:text-slate-400 mb-1">Capacidad máxima</p>
-        <p class="font-display text-2xl font-bold text-slate-900 dark:text-white">{{ ubicacion.capacidad_maxima }}</p>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-5 mb-8">
+    <article class="kpi-card">
+        <div class="flex justify-between items-center mb-4">
+            <span class="kpi-label">Capacidad máxima</span>
+            <div class="kpi-icon bg-brand-500/10">
+                <svg class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                </svg>
+            </div>
+        </div>
+        <div class="kpi-value">{{ ubicacion.capacidad_maxima }}</div>
+        <p class="text-xs text-slate-500 mt-2">Unidades máximas</p>
     </article>
-    <article class="bg-white dark:bg-base-800 border border-slate-200 dark:border-base-600/50 rounded-2xl p-5">
-        <p class="text-xs text-slate-500 dark:text-slate-400 mb-1">Ocupación actual</p>
-        <p class="font-display text-2xl font-bold text-slate-900 dark:text-white">{{ ubicacion.ocupacion_actual }}</p>
+
+    <article class="kpi-card">
+        <div class="flex justify-between items-center mb-4">
+            <span class="kpi-label">Ocupación actual</span>
+            <div class="kpi-icon bg-sky-500/10">
+                <svg class="w-5 h-5 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                </svg>
+            </div>
+        </div>
+        <div class="kpi-value">{{ ubicacion.ocupacion_actual }}</div>
+        <p class="text-xs text-slate-500 mt-2">Unidades almacenadas</p>
     </article>
-    <article class="bg-white dark:bg-base-800 border border-slate-200 dark:border-base-600/50 rounded-2xl p-5">
-        <p class="text-xs text-slate-500 dark:text-slate-400 mb-1">% Ocupación</p>
-        <p class="font-display text-2xl font-bold {% if ubicacion.porcentaje_ocupacion >= 90 %}text-red-500{% elif ubicacion.porcentaje_ocupacion >= 70 %}text-amber-500{% else %}text-emerald-500{% endif %}">
+
+    <article class="kpi-card">
+        <div class="flex justify-between items-center mb-4">
+            <span class="kpi-label">% Ocupación</span>
+            <div class="kpi-icon 
+                        {% if ubicacion.porcentaje_ocupacion >= 90 %}bg-red-500/10
+                        {% elif ubicacion.porcentaje_ocupacion >= 70 %}bg-amber-500/10
+                        {% else %}bg-emerald-500/10{% endif %}">
+                <svg class="w-5 h-5
+                            {% if ubicacion.porcentaje_ocupacion >= 90 %}text-red-500
+                            {% elif ubicacion.porcentaje_ocupacion >= 70 %}text-amber-500
+                            {% else %}text-emerald-500{% endif %}"
+                     fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                </svg>
+            </div>
+        </div>
+        <div class="kpi-value
+                    {% if ubicacion.porcentaje_ocupacion >= 90 %}text-red-500
+                    {% elif ubicacion.porcentaje_ocupacion >= 70 %}text-amber-500
+                    {% else %}text-emerald-500{% endif %}">
             {{ ubicacion.porcentaje_ocupacion }}%
-        </p>
+        </div>
+        <p class="text-xs text-slate-500 mt-2">De la capacidad total</p>
     </article>
-    <article class="bg-white dark:bg-base-800 border border-slate-200 dark:border-base-600/50 rounded-2xl p-5">
-        <p class="text-xs text-slate-500 dark:text-slate-400 mb-1">Disponible</p>
-        <p class="font-display text-2xl font-bold text-emerald-500">{{ ubicacion.capacidad_maxima|add:"-"|add:ubicacion.ocupacion_actual }}</p>
+
+    <article class="kpi-card">
+        <div class="flex justify-between items-center mb-4">
+            <span class="kpi-label">Disponible</span>
+            <div class="kpi-icon bg-emerald-500/10">
+                <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                </svg>
+            </div>
+        </div>
+        <div class="kpi-value text-emerald-500">{{ ubicacion.capacidad_maxima|add:"-"|add:ubicacion.ocupacion_actual }}</div>
+        <p class="text-xs text-slate-500 mt-2">Posiciones libres</p>
     </article>
 </div>
 
-<article class="bg-white dark:bg-base-800 border border-slate-200 dark:border-base-600/50 rounded-2xl p-5 mb-6">
-    <h2 class="font-display text-lg font-bold text-slate-900 dark:text-white mb-4">Productos almacenados</h2>
+<article class="card p-6 mb-8">
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h2 class="font-display text-xl font-bold text-white">Productos almacenados</h2>
+            <p class="text-sm text-slate-500 mt-1">Existencias actuales en esta ubicación</p>
+        </div>
+    </div>
+
     <div class="overflow-x-auto">
         <table class="w-full text-sm">
-            <thead>
-                <tr class="border-b border-slate-200 dark:border-base-600/50">
-                    <th class="text-left py-3 px-3 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">SKU</th>
-                    <th class="text-left py-3 px-3 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">Producto</th>
-                    <th class="text-right py-3 px-3 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">Cantidad</th>
+            <thead class="border-b border-dark-600">
+                <tr>
+                    <th class="text-left py-4 px-4 text-xs uppercase tracking-wider text-slate-500 font-semibold">SKU</th>
+                    <th class="text-left py-4 px-4 text-xs uppercase tracking-wider text-slate-500 font-semibold">Producto</th>
+                    <th class="text-right py-4 px-4 text-xs uppercase tracking-wider text-slate-500 font-semibold">Cantidad</th>
                 </tr>
             </thead>
             <tbody>
                 {% for e in existencias %}
-                <tr class="border-b border-slate-100 dark:border-base-600/30">
-                    <td class="py-3 px-3 font-mono text-xs text-slate-900 dark:text-white">{{ e.producto.sku }}</td>
-                    <td class="py-3 px-3 text-slate-700 dark:text-slate-300">{{ e.producto.nombre }}</td>
-                    <td class="py-3 px-3 text-right font-bold text-slate-900 dark:text-white">{{ e.cantidad }}</td>
+                <tr class="table-row">
+                    <td class="py-4 px-4 font-mono text-xs text-brand-500 font-semibold">{{ e.producto.sku }}</td>
+                    <td class="py-4 px-4 text-slate-300">{{ e.producto.nombre }}</td>
+                    <td class="py-4 px-4 text-right font-bold text-white">{{ e.cantidad }}</td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="3" class="py-8 text-center text-slate-500 dark:text-slate-400">No hay productos en esta ubicación.</td>
+                    <td colspan="3" class="py-12 text-center text-slate-500">No hay productos en esta ubicación.</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -69,33 +122,43 @@
     </div>
 </article>
 
-<article class="bg-white dark:bg-base-800 border border-slate-200 dark:border-base-600/50 rounded-2xl p-5">
-    <h2 class="font-display text-lg font-bold text-slate-900 dark:text-white mb-4">Últimos movimientos</h2>
+<article class="card p-6">
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h2 class="font-display text-xl font-bold text-white">Últimos movimientos</h2>
+            <p class="text-sm text-slate-500 mt-1">Historial reciente de esta ubicación</p>
+        </div>
+    </div>
+
     <div class="overflow-x-auto">
         <table class="w-full text-sm">
-            <thead>
-                <tr class="border-b border-slate-200 dark:border-base-600/50">
-                    <th class="text-left py-3 px-3 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">Fecha</th>
-                    <th class="text-left py-3 px-3 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">Tipo</th>
-                    <th class="text-left py-3 px-3 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">Producto</th>
-                    <th class="text-right py-3 px-3 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">Cantidad</th>
+            <thead class="border-b border-dark-600">
+                <tr>
+                    <th class="text-left py-4 px-4 text-xs uppercase tracking-wider text-slate-500 font-semibold">Fecha</th>
+                    <th class="text-left py-4 px-4 text-xs uppercase tracking-wider text-slate-500 font-semibold">Tipo</th>
+                    <th class="text-left py-4 px-4 text-xs uppercase tracking-wider text-slate-500 font-semibold">Producto</th>
+                    <th class="text-right py-4 px-4 text-xs uppercase tracking-wider text-slate-500 font-semibold">Cantidad</th>
                 </tr>
             </thead>
             <tbody>
                 {% for m in movimientos %}
-                <tr class="border-b border-slate-100 dark:border-base-600/30">
-                    <td class="py-3 px-3 text-slate-600 dark:text-slate-300">{{ m.fecha|date:"d/m H:i" }}</td>
-                    <td class="py-3 px-3">
-                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-medium {% if m.tipo == 'INGRESO' %}bg-emerald-500/10 text-emerald-400{% elif m.tipo == 'RETIRO' %}bg-red-500/10 text-red-400{% else %}bg-sky-500/10 text-sky-400{% endif %}">
-                            {{ m.get_tipo_display }}
-                        </span>
+                <tr class="table-row">
+                    <td class="py-4 px-4 text-slate-400 text-xs">{{ m.fecha|date:"d/m/Y H:i" }}</td>
+                    <td class="py-4 px-4">
+                        {% if m.tipo == 'INGRESO' %}
+                            <span class="badge badge-success">Ingreso</span>
+                        {% elif m.tipo == 'RETIRO' %}
+                            <span class="badge badge-danger">Retiro</span>
+                        {% else %}
+                            <span class="badge badge-info">{{ m.get_tipo_display }}</span>
+                        {% endif %}
                     </td>
-                    <td class="py-3 px-3 text-slate-700 dark:text-slate-300">{{ m.producto.sku }}</td>
-                    <td class="py-3 px-3 text-right text-slate-900 dark:text-white font-bold">{{ m.cantidad }}</td>
+                    <td class="py-4 px-4 text-slate-300 text-xs">{{ m.producto.sku }}</td>
+                    <td class="py-4 px-4 text-right font-bold text-white">{{ m.cantidad }}</td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="4" class="py-8 text-center text-slate-500 dark:text-slate-400">No hay movimientos registrados.</td>
+                    <td colspan="4" class="py-12 text-center text-slate-500">No hay movimientos registrados.</td>
                 </tr>
                 {% endfor %}
             </tbody>

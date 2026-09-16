@@ -1,0 +1,288 @@
+{% extends 'base.html' %}
+
+{% block title %}Reportes · C.TECH{% endblock %}
+
+{% block content %}
+
+<!-- Header con botones de exportación -->
+<div class="flex justify-between items-end mb-8">
+    <div>
+        <p class="text-sm text-slate-500 mb-2">Inicio › Reportes</p>
+        <h1 class="font-display text-4xl font-bold text-white">Reportes y Análisis</h1>
+        <p class="text-slate-400 text-sm mt-2">
+            {{ etiqueta_filtro }} · Del {{ fecha_desde }} al {{ fecha_hasta }}
+        </p>
+    </div>
+    <div class="flex items-center gap-2">
+        <a href="{% url 'reportes:exportar_pdf' %}?filtro={{ filtro_actual }}" 
+           class="btn btn-secondary text-xs" title="Exportar a PDF">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+            </svg>
+            PDF
+        </a>
+        <a href="{% url 'reportes:exportar_excel' %}?filtro={{ filtro_actual }}" 
+           class="btn btn-secondary text-xs" title="Exportar a Excel">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"/>
+            </svg>
+            Excel
+        </a>
+        <a href="{% url 'reportes:exportar_word' %}?filtro={{ filtro_actual }}" 
+           class="btn btn-secondary text-xs" title="Exportar a Word">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            Word
+        </a>
+    </div>
+</div>
+
+<!-- Filtros rápidos por fecha -->
+<div class="mb-8 flex flex-wrap gap-2">
+    <a href="?filtro=hoy" class="btn {% if filtro_actual == 'hoy' %}btn-primary{% else %}btn-secondary{% endif %} text-xs">
+        Hoy
+    </a>
+    <a href="?filtro=7dias" class="btn {% if filtro_actual == '7dias' %}btn-primary{% else %}btn-secondary{% endif %} text-xs">
+        Últimos 7 días
+    </a>
+    <a href="?filtro=30dias" class="btn {% if filtro_actual == '30dias' %}btn-primary{% else %}btn-secondary{% endif %} text-xs">
+        Últimos 30 días
+    </a>
+    <a href="?filtro=mes" class="btn {% if filtro_actual == 'mes' %}btn-primary{% else %}btn-secondary{% endif %} text-xs">
+        Este mes
+    </a>
+    <a href="?filtro=ano" class="btn {% if filtro_actual == 'ano' %}btn-primary{% else %}btn-secondary{% endif %} text-xs">
+        Este año
+    </a>
+</div>
+
+<!-- KPIs -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+    <article class="kpi-card">
+        <div class="flex justify-between items-center mb-4">
+            <span class="kpi-label">Total productos</span>
+            <div class="kpi-icon bg-brand-500/10">
+                <svg class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                </svg>
+            </div>
+        </div>
+        <div class="kpi-value">{{ total_productos }}</div>
+        <p class="text-xs text-slate-500 mt-2">SKUs activos</p>
+    </article>
+
+    <article class="kpi-card">
+        <div class="flex justify-between items-center mb-4">
+            <span class="kpi-label">Total stock</span>
+            <div class="kpi-icon bg-sky-500/10">
+                <svg class="w-5 h-5 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                </svg>
+            </div>
+        </div>
+        <div class="kpi-value">{{ total_stock }}</div>
+        <p class="text-xs text-slate-500 mt-2">Unidades en sistema</p>
+    </article>
+
+    <article class="kpi-card">
+        <div class="flex justify-between items-center mb-4">
+            <span class="kpi-label">Movimientos</span>
+            <div class="kpi-icon bg-emerald-500/10">
+                <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+        </div>
+        <div class="kpi-value">{{ total_movimientos }}</div>
+        <p class="text-xs text-slate-500 mt-2">{{ etiqueta_filtro }}</p>
+    </article>
+
+    <article class="kpi-card">
+        <div class="flex justify-between items-center mb-4">
+            <span class="kpi-label">Valor inventario</span>
+            <div class="kpi-icon bg-violet-500/10">
+                <svg class="w-5 h-5 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+        </div>
+        <div class="kpi-value">${{ valor_inventario|floatformat:0 }}</div>
+        <p class="text-xs text-slate-500 mt-2">Valor total</p>
+    </article>
+</div>
+
+<!-- Gráfica: Movimientos por categoría -->
+<article class="card p-6 mb-8">
+    <div class="flex justify-between items-center mb-5">
+        <div>
+            <h2 class="font-display text-lg font-bold text-white">Movimientos por categoría</h2>
+            <p class="text-xs text-slate-500 mt-0.5">{{ etiqueta_filtro }} · Entradas vs Salidas</p>
+        </div>
+    </div>
+    <div style="height: 300px;">
+        <canvas id="chartMovCategorias"></canvas>
+    </div>
+</article>
+
+<!-- Grid: Stock por categoría + Top productos -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+
+    <article class="card p-6">
+        <div class="flex justify-between items-center mb-5">
+            <div>
+                <h2 class="font-display text-lg font-bold text-white">Stock por categoría</h2>
+                <p class="text-xs text-slate-500 mt-0.5">Distribución actual</p>
+            </div>
+        </div>
+        <div style="height: 280px;">
+            <canvas id="chartStockCategorias"></canvas>
+        </div>
+    </article>
+
+    <article class="card p-6">
+        <div class="flex justify-between items-center mb-5">
+            <div>
+                <h2 class="font-display text-lg font-bold text-white">Top 10 productos más vendidos</h2>
+                <p class="text-xs text-slate-500 mt-0.5">{{ etiqueta_filtro }}</p>
+            </div>
+        </div>
+        <div class="overflow-x-auto" style="max-height: 280px;">
+            <table class="w-full text-sm">
+                <thead class="border-b border-dark-600">
+                    <tr>
+                        <th class="text-left py-3 px-3 text-xs uppercase tracking-wider text-slate-500 font-semibold">SKU</th>
+                        <th class="text-left py-3 px-3 text-xs uppercase tracking-wider text-slate-500 font-semibold">Producto</th>
+                        <th class="text-right py-3 px-3 text-xs uppercase tracking-wider text-slate-500 font-semibold">Vendido</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in top_productos %}
+                    <tr class="table-row">
+                        <td class="py-3 px-3 font-mono text-xs text-brand-500 font-semibold">{{ p.producto__sku }}</td>
+                        <td class="py-3 px-3 text-slate-300 text-xs">{{ p.producto__nombre|truncatechars:25 }}</td>
+                        <td class="py-3 px-3 text-right font-bold text-white">{{ p.total_vendido }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" class="py-8 text-center text-slate-500 text-xs">No hay ventas registradas.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </article>
+</div>
+
+<!-- Tabla: Detalle por categoría -->
+<article class="card p-6">
+    <div class="flex justify-between items-center mb-5">
+        <div>
+            <h2 class="font-display text-lg font-bold text-white">Detalle por categoría</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Resumen general</p>
+        </div>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead class="border-b border-dark-600">
+                <tr>
+                    <th class="text-left py-4 px-4 text-xs uppercase tracking-wider text-slate-500 font-semibold">Categoría</th>
+                    <th class="text-right py-4 px-4 text-xs uppercase tracking-wider text-slate-500 font-semibold">Productos</th>
+                    <th class="text-right py-4 px-4 text-xs uppercase tracking-wider text-slate-500 font-semibold">Stock</th>
+                    <th class="text-right py-4 px-4 text-xs uppercase tracking-wider text-slate-500 font-semibold">Entradas</th>
+                    <th class="text-right py-4 px-4 text-xs uppercase tracking-wider text-slate-500 font-semibold">Salidas</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in stock_por_categoria %}
+                <tr class="table-row">
+                    <td class="py-4 px-4 font-semibold text-white">{{ item.categoria.nombre }}</td>
+                    <td class="py-4 px-4 text-right text-slate-300">{{ item.productos }}</td>
+                    <td class="py-4 px-4 text-right font-bold text-brand-500">{{ item.stock }}</td>
+                    <td class="py-4 px-4 text-right text-emerald-400">{{ item.entradas }}</td>
+                    <td class="py-4 px-4 text-right text-red-400">{{ item.salidas }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="py-12 text-center text-slate-500">No hay datos disponibles.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</article>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    Chart.defaults.color = '#94a3b8';
+    Chart.defaults.borderColor = 'rgba(148, 163, 184, 0.1)';
+    Chart.defaults.font.family = 'Inter, sans-serif';
+
+    // Gráfica: Movimientos por categoría
+    const ctxMov = document.getElementById('chartMovCategorias').getContext('2d');
+    new Chart(ctxMov, {
+        type: 'bar',
+        data: {
+            labels: {{ labels_categorias_json|safe }},
+            datasets: [
+                {
+                    label: 'Entradas',
+                    data: {{ data_entradas_categorias_json|safe }},
+                    backgroundColor: '#10B981',
+                    borderRadius: 8,
+                    borderSkipped: false,
+                },
+                {
+                    label: 'Salidas',
+                    data: {{ data_salidas_categorias_json|safe }},
+                    backgroundColor: '#EF4444',
+                    borderRadius: 8,
+                    borderSkipped: false,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    align: 'end',
+                    labels: { padding: 15, usePointStyle: true, pointStyle: 'circle' }
+                }
+            },
+            scales: {
+                y: { beginAtZero: true, grid: { color: 'rgba(148, 163, 184, 0.1)' } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+
+    // Gráfica: Stock por categoría
+    const ctxStock = document.getElementById('chartStockCategorias').getContext('2d');
+    new Chart(ctxStock, {
+        type: 'doughnut',
+        data: {
+            labels: {{ labels_categorias_json|safe }},
+            datasets: [{
+                data: {{ data_stock_categorias_json|safe }},
+                backgroundColor: ['#FF6B35', '#8B5CF6', '#06B6D4', '#10B981', '#F59E0B'],
+                borderWidth: 0,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '65%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { padding: 15, usePointStyle: true, pointStyle: 'circle' }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

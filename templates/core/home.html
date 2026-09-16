@@ -20,7 +20,6 @@
 
 <!-- KPIs -->
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5 mb-8">
-
     <article class="kpi-card">
         <div class="flex justify-between items-center mb-4">
             <span class="kpi-label">Productos</span>
@@ -88,6 +87,49 @@
     </article>
 </div>
 
+<!-- GRÁFICAS -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+
+    <!-- Gráfica 1: Movimientos últimos 30 días -->
+    <article class="card p-6 lg:col-span-2">
+        <div class="flex justify-between items-center mb-5">
+            <div>
+                <h2 class="font-display text-lg font-bold text-white">Movimientos últimos 30 días</h2>
+                <p class="text-xs text-slate-500 mt-0.5">Entradas vs Salidas</p>
+            </div>
+        </div>
+        <div style="height: 300px;">
+            <canvas id="chartMovimientos"></canvas>
+        </div>
+    </article>
+
+    <!-- Gráfica 2: Stock por categoría -->
+    <article class="card p-6">
+        <div class="flex justify-between items-center mb-5">
+            <div>
+                <h2 class="font-display text-lg font-bold text-white">Stock por categoría</h2>
+                <p class="text-xs text-slate-500 mt-0.5">Unidades en sistema</p>
+            </div>
+        </div>
+        <div style="height: 280px;">
+            <canvas id="chartCategorias"></canvas>
+        </div>
+    </article>
+
+    <!-- Gráfica 3: Ocupación por bodega -->
+    <article class="card p-6">
+        <div class="flex justify-between items-center mb-5">
+            <div>
+                <h2 class="font-display text-lg font-bold text-white">Ocupación por bodega</h2>
+                <p class="text-xs text-slate-500 mt-0.5">Distribución de stock</p>
+            </div>
+        </div>
+        <div style="height: 280px;">
+            <canvas id="chartBodegas"></canvas>
+        </div>
+    </article>
+</div>
+
 <!-- Últimos movimientos -->
 <article class="card p-6">
     <div class="flex justify-between items-center mb-6">
@@ -150,4 +192,156 @@
     </div>
 </article>
 
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Configuración global de Chart.js
+    Chart.defaults.color = '#94a3b8';
+    Chart.defaults.borderColor = 'rgba(148, 163, 184, 0.1)';
+    Chart.defaults.font.family = 'Inter, sans-serif';
+
+    // ==========================================
+    // GRÁFICA 1: Movimientos últimos 30 días
+    // ==========================================
+    const ctxMovimientos = document.getElementById('chartMovimientos').getContext('2d');
+    new Chart(ctxMovimientos, {
+        type: 'line',
+        data: {
+            labels: {{ fechas_json|safe }},
+            datasets: [
+                {
+                    label: 'Entradas',
+                    data: {{ entradas_json|safe }},
+                    borderColor: '#10B981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 3,
+                    pointBackgroundColor: '#10B981',
+                },
+                {
+                    label: 'Salidas',
+                    data: {{ salidas_json|safe }},
+                    borderColor: '#EF4444',
+                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 3,
+                    pointBackgroundColor: '#EF4444',
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    align: 'end',
+                    labels: {
+                        padding: 15,
+                        usePointStyle: true,
+                        pointStyle: 'circle',
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(148, 163, 184, 0.1)',
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false,
+                    }
+                }
+            }
+        }
+    });
+
+    // ==========================================
+    // GRÁFICA 2: Stock por categoría
+    // ==========================================
+    const ctxCategorias = document.getElementById('chartCategorias').getContext('2d');
+    new Chart(ctxCategorias, {
+        type: 'bar',
+        data: {
+            labels: {{ categorias_json|safe }},
+            datasets: [{
+                label: 'Unidades',
+                data: {{ stock_categorias_json|safe }},
+                backgroundColor: [
+                    '#FF6B35',
+                    '#8B5CF6',
+                    '#06B6D4',
+                    '#10B981',
+                    '#F59E0B',
+                ],
+                borderRadius: 8,
+                borderSkipped: false,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false,
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(148, 163, 184, 0.1)',
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false,
+                    }
+                }
+            }
+        }
+    });
+
+    // ==========================================
+    // GRÁFICA 3: Ocupación por bodega
+    // ==========================================
+    const ctxBodegas = document.getElementById('chartBodegas').getContext('2d');
+    new Chart(ctxBodegas, {
+        type: 'doughnut',
+        data: {
+            labels: {{ bodegas_json|safe }},
+            datasets: [{
+                data: {{ ocupacion_bodegas_json|safe }},
+                backgroundColor: [
+                    '#FF6B35',
+                    '#8B5CF6',
+                    '#06B6D4',
+                    '#10B981',
+                ],
+                borderWidth: 0,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '65%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 15,
+                        usePointStyle: true,
+                        pointStyle: 'circle',
+                    }
+                }
+            }
+        }
+    });
+</script>
 {% endblock %}

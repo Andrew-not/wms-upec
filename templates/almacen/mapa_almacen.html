@@ -1,65 +1,91 @@
 {% extends 'base.html' %}
 
-{% block title %}Mapa del Almacén · TechStock{% endblock %}
+{% block title %}Mapa del Almacén · C.TECH{% endblock %}
 
 {% block content %}
 
-<div class="flex justify-between items-end mb-6">
+<div class="flex justify-between items-end mb-8">
     <div>
-        <p class="text-sm text-slate-500 dark:text-slate-400 mb-1">Inicio › Almacén › Mapa</p>
-        <h1 class="font-display text-3xl font-bold text-slate-900 dark:text-white">Mapa del Almacén</h1>
-        <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">Vista visual de las zonas y su ocupación</p>
+        <p class="text-sm text-slate-500 mb-2">Inicio › Almacén › Mapa</p>
+        <h1 class="font-display text-4xl font-bold text-white">Mapa del Almacén</h1>
+        <p class="text-slate-400 text-sm mt-2">Vista visual de las zonas y su ocupación</p>
     </div>
+    <a href="{% url 'almacen:ubicacion_lista' %}" class="btn btn-secondary">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+        </svg>
+        Ver listado
+    </a>
 </div>
 
-<div class="bg-white dark:bg-base-800 border border-slate-200 dark:border-base-600/50 rounded-2xl p-5 mb-6">
+<div class="card-lg mb-8">
     <form method="get" class="flex items-center gap-3">
-        <label class="text-sm text-slate-600 dark:text-slate-400">Bodega:</label>
-        <select name="bodega" onchange="this.form.submit()" class="px-3 py-2.5 rounded-lg text-sm bg-slate-50 dark:bg-base-900 border border-slate-200 dark:border-base-600 text-slate-900 dark:text-slate-100">
+        <label class="text-sm text-slate-400">Bodega:</label>
+        <select name="bodega" onchange="this.form.submit()" class="input max-w-xs">
             {% for b in bodegas %}
-                <option value="{{ b.id }}" {% if bodega and b.id == bodega.id %}selected{% endif %}>{{ b.codigo }} - {{ b.nombre }}</option>
+                <option value="{{ b.id }}" {% if bodega and b.id == bodega.id %}selected{% endif %}>
+                    {{ b.codigo }} - {{ b.nombre }}
+                </option>
             {% endfor %}
         </select>
-        <a href="{% url 'almacen:ubicacion_lista' %}" class="ml-auto inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-slate-100 dark:bg-base-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-base-600 transition-colors">
-            Ver listado
-        </a>
     </form>
 </div>
 
 {% if bodega %}
 <div class="space-y-6">
     {% for zona in zonas %}
-    <article class="bg-white dark:bg-base-800 border border-slate-200 dark:border-base-600/50 rounded-2xl p-5">
-        <div class="flex justify-between items-center mb-4">
+    <article class="card p-6">
+        <div class="flex justify-between items-center mb-5">
             <div>
-                <h2 class="font-display text-lg font-bold text-slate-900 dark:text-white">{{ zona.codigo }} · {{ zona.nombre }}</h2>
-                <p class="text-xs text-slate-500 dark:text-slate-400">{{ zona.get_tipo_display }}</p>
+                <h2 class="font-display text-xl font-bold text-white">{{ zona.codigo }} · {{ zona.nombre }}</h2>
+                <p class="text-sm text-slate-500 mt-1">{{ zona.get_tipo_display }}</p>
             </div>
-            <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-sky-500/10 text-sky-400 border border-sky-500/20">
-                {{ zona.ubicaciones.count }} ubicaciones
-            </span>
+            <span class="badge badge-brand">{{ zona.ubicaciones.count }} ubicaciones</span>
         </div>
+
         <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
             {% for ubi in zona.ubicaciones.all %}
-            <a href="{% url 'almacen:ubicacion_detalle' ubi.codigo %}" class="group relative p-3 rounded-xl border transition-all hover:scale-105 {% if ubi.porcentaje_ocupacion >= 90 %}bg-red-500/10 border-red-500/30 hover:bg-red-500/20{% elif ubi.porcentaje_ocupacion >= 70 %}bg-amber-500/10 border-amber-500/30 hover:bg-amber-500/20{% elif ubi.porcentaje_ocupacion > 0 %}bg-sky-500/10 border-sky-500/30 hover:bg-sky-500/20{% else %}bg-slate-100 dark:bg-base-700 border-slate-300 dark:border-base-600 hover:bg-slate-200 dark:hover:bg-base-600{% endif %}">
-                <p class="font-mono text-xs font-bold text-slate-900 dark:text-white mb-1 text-center">{{ ubi.codigo }}</p>
-                <div class="w-full h-1.5 rounded-full bg-slate-200 dark:bg-base-900 overflow-hidden mb-1">
-                    <div class="h-full rounded-full {% if ubi.porcentaje_ocupacion >= 90 %}bg-red-500{% elif ubi.porcentaje_ocupacion >= 70 %}bg-amber-500{% elif ubi.porcentaje_ocupacion > 0 %}bg-sky-500{% else %}bg-slate-400{% endif %}" style="width: {{ ubi.porcentaje_ocupacion }}%"></div>
+            <a href="{% url 'almacen:ubicacion_detalle' ubi.codigo %}" 
+               class="group relative p-4 rounded-2xl border transition-all hover:scale-105
+                      {% if ubi.porcentaje_ocupacion >= 90 %}
+                          bg-red-500/10 border-red-500/30 hover:bg-red-500/20
+                      {% elif ubi.porcentaje_ocupacion >= 70 %}
+                          bg-amber-500/10 border-amber-500/30 hover:bg-amber-500/20
+                      {% elif ubi.porcentaje_ocupacion > 0 %}
+                          bg-brand-500/10 border-brand-500/30 hover:bg-brand-500/20
+                      {% else %}
+                          bg-dark-800 border-dark-600 hover:bg-dark-700
+                      {% endif %}">
+
+                <p class="font-mono text-xs font-bold text-white mb-2 text-center">
+                    {{ ubi.codigo }}
+                </p>
+
+                <div class="w-full h-1.5 rounded-full bg-dark-900 overflow-hidden mb-2">
+                    <div class="h-full rounded-full 
+                                {% if ubi.porcentaje_ocupacion >= 90 %}bg-red-500
+                                {% elif ubi.porcentaje_ocupacion >= 70 %}bg-amber-500
+                                {% elif ubi.porcentaje_ocupacion > 0 %}bg-brand-500
+                                {% else %}bg-slate-700{% endif %}"
+                         style="width: {{ ubi.porcentaje_ocupacion }}%"></div>
                 </div>
-                <p class="text-[10px] text-center text-slate-600 dark:text-slate-400">{{ ubi.ocupacion_actual }}/{{ ubi.capacidad_maxima }}</p>
+
+                <p class="text-[10px] text-center text-slate-400">
+                    {{ ubi.ocupacion_actual }}/{{ ubi.capacidad_maxima }}
+                </p>
             </a>
             {% endfor %}
         </div>
     </article>
     {% empty %}
-    <div class="bg-white dark:bg-base-800 border border-slate-200 dark:border-base-600/50 rounded-2xl p-12 text-center">
-        <p class="text-slate-500 dark:text-slate-400">Esta bodega no tiene zonas registradas.</p>
+    <div class="card p-12 text-center">
+        <p class="text-slate-500">Esta bodega no tiene zonas registradas.</p>
     </div>
     {% endfor %}
 </div>
 {% else %}
-<div class="bg-white dark:bg-base-800 border border-slate-200 dark:border-base-600/50 rounded-2xl p-12 text-center">
-    <p class="text-slate-500 dark:text-slate-400">No hay bodegas registradas.</p>
+<div class="card p-12 text-center">
+    <p class="text-slate-500">No hay bodegas registradas.</p>
 </div>
 {% endif %}
 

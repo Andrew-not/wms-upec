@@ -1,22 +1,22 @@
 {% extends 'base.html' %}
 
-{% block title %}Orden {{ orden.numero }} · Recepción{% endblock %}
+{% block title %}Orden {{ orden.numero }} · Recepción · C.TECH{% endblock %}
 
 {% block content %}
 
-<div class="flex justify-between items-end mb-6">
+<div class="flex justify-between items-end mb-8">
     <div>
-        <p class="text-sm text-slate-500 dark:text-slate-400 mb-1">
-            <a href="{% url 'recepcion:orden_lista' %}" class="hover:text-accent-blue">Recepción</a> › {{ orden.numero }}
+        <p class="text-sm text-slate-500 mb-2">
+            <a href="{% url 'recepcion:orden_lista' %}" class="hover:text-brand-500">Recepción</a> › {{ orden.numero }}
         </p>
-        <h1 class="font-display text-3xl font-bold text-slate-900 dark:text-white font-mono">{{ orden.numero }}</h1>
-        <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">{{ orden.proveedor.razon_social }}</p>
+        <h1 class="font-display text-4xl font-bold text-white font-mono">{{ orden.numero }}</h1>
+        <p class="text-slate-400 text-sm mt-2">{{ orden.proveedor.razon_social }}</p>
     </div>
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-3">
         {% if orden.estado != 'RECIBIDA' and orden.estado != 'CANCELADA' %}
         <form method="post" action="{% url 'recepcion:recibir_orden' orden.numero %}" class="inline">
             {% csrf_token %}
-            <button type="submit" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium shadow-lg shadow-emerald-500/20 transition-all">
+            <button type="submit" class="btn btn-primary">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
                 </svg>
@@ -24,7 +24,7 @@
             </button>
         </form>
         {% endif %}
-        <a href="{% url 'recepcion:orden_lista' %}" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-slate-100 dark:bg-base-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-base-600 transition-colors text-sm">
+        <a href="{% url 'recepcion:orden_lista' %}" class="btn btn-secondary">
             Volver
         </a>
     </div>
@@ -32,75 +32,93 @@
 
 {% if messages %}
     {% for message in messages %}
-        <div class="mb-4 px-4 py-3 rounded-lg text-sm {% if message.tags == 'success' %}bg-emerald-500/10 text-emerald-400 border border-emerald-500/20{% else %}bg-red-500/10 text-red-400 border border-red-500/20{% endif %}">
+        <div class="mb-4 px-5 py-4 rounded-2xl text-sm 
+                    {% if message.tags == 'success' %}bg-emerald-500/10 text-emerald-400 border border-emerald-500/20
+                    {% else %}bg-red-500/10 text-red-400 border border-red-500/20{% endif %}">
             {{ message }}
         </div>
     {% endfor %}
 {% endif %}
 
-<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-    <article class="bg-white dark:bg-base-800 border border-slate-200 dark:border-base-600/50 rounded-2xl p-5">
-        <p class="text-xs text-slate-500 dark:text-slate-400 mb-1">Estado</p>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-5 mb-8">
+    <article class="kpi-card">
+        <div class="flex justify-between items-center mb-4">
+            <span class="kpi-label">Estado</span>
+        </div>
         {% if orden.estado == 'PENDIENTE' %}
-            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">Pendiente</span>
+            <span class="badge badge-warning">Pendiente</span>
         {% elif orden.estado == 'EN_PROCESO' %}
-            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-sky-500/10 text-sky-400 border border-sky-500/20">En proceso</span>
+            <span class="badge badge-info">En proceso</span>
         {% elif orden.estado == 'RECIBIDA' %}
-            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Recibida</span>
+            <span class="badge badge-success">Recibida</span>
         {% else %}
-            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-red-500/10 text-red-400 border border-red-500/20">Cancelada</span>
+            <span class="badge badge-danger">Cancelada</span>
         {% endif %}
     </article>
-    <article class="bg-white dark:bg-base-800 border border-slate-200 dark:border-base-600/50 rounded-2xl p-5">
-        <p class="text-xs text-slate-500 dark:text-slate-400 mb-1">Fecha esperada</p>
-        <p class="font-display text-lg font-bold text-slate-900 dark:text-white">{{ orden.fecha_esperada|date:"d/m/Y" }}</p>
+
+    <article class="kpi-card">
+        <div class="flex justify-between items-center mb-4">
+            <span class="kpi-label">Fecha esperada</span>
+        </div>
+        <div class="font-display text-xl font-bold text-white">{{ orden.fecha_esperada|date:"d/m/Y" }}</div>
     </article>
-    <article class="bg-white dark:bg-base-800 border border-slate-200 dark:border-base-600/50 rounded-2xl p-5">
-        <p class="text-xs text-slate-500 dark:text-slate-400 mb-1">Unidades esperadas</p>
-        <p class="font-display text-2xl font-bold text-slate-900 dark:text-white">{{ orden.total_unidades_esperadas }}</p>
+
+    <article class="kpi-card">
+        <div class="flex justify-between items-center mb-4">
+            <span class="kpi-label">Unidades esperadas</span>
+        </div>
+        <div class="kpi-value">{{ orden.total_unidades_esperadas }}</div>
     </article>
-    <article class="bg-white dark:bg-base-800 border border-slate-200 dark:border-base-600/50 rounded-2xl p-5">
-        <p class="text-xs text-slate-500 dark:text-slate-400 mb-1">% Recepción</p>
-        <p class="font-display text-2xl font-bold {% if orden.porcentaje_recepcion >= 100 %}text-emerald-500{% elif orden.porcentaje_recepcion > 0 %}text-sky-500{% else %}text-slate-400{% endif %}">{{ orden.porcentaje_recepcion }}%</p>
+
+    <article class="kpi-card">
+        <div class="flex justify-between items-center mb-4">
+            <span class="kpi-label">% Recepción</span>
+        </div>
+        <div class="kpi-value
+                    {% if orden.porcentaje_recepcion >= 100 %}text-emerald-500
+                    {% elif orden.porcentaje_recepcion > 0 %}text-brand-500
+                    {% else %}text-slate-500{% endif %}">
+            {{ orden.porcentaje_recepcion }}%
+        </div>
     </article>
 </div>
 
-<article class="bg-white dark:bg-base-800 border border-slate-200 dark:border-base-600/50 rounded-2xl p-5">
-    <h2 class="font-display text-lg font-bold text-slate-900 dark:text-white mb-4">Líneas de la orden</h2>
+<article class="card p-6">
+    <h2 class="font-display text-xl font-bold text-white mb-6">Líneas de la orden</h2>
     <div class="overflow-x-auto">
         <table class="w-full text-sm">
-            <thead>
-                <tr class="border-b border-slate-200 dark:border-base-600/50">
-                    <th class="text-left py-3 px-3 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">Producto</th>
-                    <th class="text-right py-3 px-3 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">Esperado</th>
-                    <th class="text-right py-3 px-3 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">Recibido</th>
-                    <th class="text-left py-3 px-3 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">Ubicación destino</th>
-                    <th class="text-center py-3 px-3 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">Estado</th>
+            <thead class="border-b border-dark-600">
+                <tr>
+                    <th class="text-left py-4 px-4 text-xs uppercase tracking-wider text-slate-500 font-semibold">Producto</th>
+                    <th class="text-right py-4 px-4 text-xs uppercase tracking-wider text-slate-500 font-semibold">Esperado</th>
+                    <th class="text-right py-4 px-4 text-xs uppercase tracking-wider text-slate-500 font-semibold">Recibido</th>
+                    <th class="text-left py-4 px-4 text-xs uppercase tracking-wider text-slate-500 font-semibold">Ubicación destino</th>
+                    <th class="text-center py-4 px-4 text-xs uppercase tracking-wider text-slate-500 font-semibold">Estado</th>
                 </tr>
             </thead>
             <tbody>
                 {% for linea in lineas %}
-                <tr class="border-b border-slate-100 dark:border-base-600/30">
-                    <td class="py-3 px-3">
-                        <strong class="text-slate-900 dark:text-white text-xs font-mono">{{ linea.producto.sku }}</strong><br>
-                        <small class="text-slate-500 dark:text-slate-400">{{ linea.producto.nombre }}</small>
+                <tr class="table-row">
+                    <td class="py-4 px-4">
+                        <div class="text-brand-500 font-semibold text-xs font-mono">{{ linea.producto.sku }}</div>
+                        <div class="text-slate-400 text-[11px] mt-1">{{ linea.producto.nombre }}</div>
                     </td>
-                    <td class="py-3 px-3 text-right text-slate-700 dark:text-slate-300">{{ linea.cantidad_esperada }}</td>
-                    <td class="py-3 px-3 text-right font-bold text-slate-900 dark:text-white">{{ linea.cantidad_recibida }}</td>
-                    <td class="py-3 px-3 text-slate-600 dark:text-slate-300 font-mono text-xs">{{ linea.ubicacion_destino.codigo }}</td>
-                    <td class="py-3 px-3 text-center">
+                    <td class="py-4 px-4 text-right text-slate-300">{{ linea.cantidad_esperada }}</td>
+                    <td class="py-4 px-4 text-right font-bold text-white">{{ linea.cantidad_recibida }}</td>
+                    <td class="py-4 px-4 text-slate-400 text-xs font-mono">{{ linea.ubicacion_destino.codigo }}</td>
+                    <td class="py-4 px-4 text-center">
                         {% if linea.completa %}
-                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Completa</span>
+                            <span class="badge badge-success">Completa</span>
                         {% elif linea.cantidad_recibida > 0 %}
-                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-medium bg-sky-500/10 text-sky-400 border border-sky-500/20">Parcial</span>
+                            <span class="badge badge-info">Parcial</span>
                         {% else %}
-                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-medium bg-slate-500/10 text-slate-400 border border-slate-500/20">Pendiente</span>
+                            <span class="badge badge-neutral">Pendiente</span>
                         {% endif %}
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="5" class="py-8 text-center text-slate-500 dark:text-slate-400">No hay líneas en esta orden.</td>
+                    <td colspan="5" class="py-12 text-center text-slate-500">No hay líneas en esta orden.</td>
                 </tr>
                 {% endfor %}
             </tbody>

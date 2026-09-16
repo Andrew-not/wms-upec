@@ -15,6 +15,7 @@ urlpatterns = [
     path('despacho/', include('apps.despacho.urls')),
     path('servicio/', include('apps.servicio.urls')),
     path('mi-espacio/', include('apps.workspace.urls')),
+    path('reportes/', include('apps.reportes.urls')),
 
     path('login/', auth_views.LoginView.as_view(
         template_name='registration/login.html'

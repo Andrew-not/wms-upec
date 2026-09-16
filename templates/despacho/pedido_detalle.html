@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+
+{% block title %}Pedido {{ pedido.numero }} · Despacho · C.TECH{% endblock %}
+
+{% block content %}
+
+<div class="flex justify-between items-end mb-8">
+    <div>
+        <p class="text-sm text-slate-500 mb-2">
+            <a href="{% url 'despacho:pedido_lista' %}" class="hover:text-brand-500">Despacho</a> › {{ pedido.numero }}
+        </p>
+        <h1 class="font-display text-4xl font-bold text-white font-mono">{{ pedido.numero }}</h1>
+        <p class="text-slate-400 text-sm mt-2">{{ pedido.cliente.razon_social }}</p>
+    </div>
+    <div class="flex items-center gap-3">
+        {% if pedido.estado == 'PENDIENTE' or pedido.estado == 'PICKING' %}
+        <form method="post" action="{% url 'despacho:procesar_picking' pedido.numero %}" class="inline">
+            {% csrf_token %}
+            <input type="hidden" name="accion" value="picking">
+            <button type="submit" class="btn btn-primary">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                </svg>
+                Procesar picking
+            </button>
+        </form>
+        {% endif %}
+
+        {% if pedido.estado == 'PREPARADO' %}
+        <form method="post" action="{% url 'despacho:procesar_picking' pedido.numero %}" class="inline">
+            {% csrf_token %}
+            <input type="hidden" name="accion" value="despachar">
+            <button type="submit" class="btn btn-primary">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                </svg>
+                Despachar pedido
+            </button>
+        </form>
+        {% endif %}
+
+        <a href="{% url 'despacho:pedido_lista' %}" class="btn btn-secondary">
+            Volver
+        </a>
+    </div>
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="mb-4 px-5 py-4 rounded-2xl text-sm 
+                    {% if message.tags == 'success' %}bg-emerald-500/10 text-emerald-400 border border-emerald-500/20
+                    {% else %}bg-red-500/10 text-red-400 border border-red-500/20{% endif %}">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+<div class="grid grid-cols-1 md:grid-cols-4 gap-5 mb-8">
+    <article class="kpi-card">
+        <div class="flex justify-between items-center mb-4">
+            <span class="kpi-label">Estado</span>
+        </div>
+        {% if pedido.estado == 'PENDIENTE' %}
+            <span class="badge badge-warning">Pendiente</span>
+        {% elif pedido.estado == 'PICKING' %}
+            <span class="badge badge-info">En picking</span>
+        {% elif pedido.estado == 'PREPARADO' %}
+            <span class="badge badge-brand">Preparado</span>
+        {% elif pedido.estado == 'DESPACHADO' %}
+            <span class="badge badge-success">Despachado</span>
+        {% else %}
+            <span class="badge badge-danger">Cancelado</span>
+        {% endif %}
+    </article>
+
+    <article class="kpi-card">
+        <div class="flex justify-between items-center mb-4">
+            <span class="kpi-label">Prioridad</span>
+        </div>
+        {% if pedido.prioridad == 'URGENTE' %}
+            <span class="badge badge-danger">Urgente</span>
+        {% elif pedido.prioridad == 'ALTA' %}
+            <span class="badge badge-warning">Alta</span>
+        {% elif pedido.prioridad == 'NORMAL' %}
+            <span class="badge badge-info">Normal</span>
+        {% else %}
+            <span class="badge badge-neutral">Baja</span>
+        {% endif %}
+    </article>
+
+    <article class="kpi-card">
+        <div class="flex justify-between items-center mb-4">
+            <span class="kpi-label">Total unidades</span>
+        </div>
+        <div class="kpi-value">{{ pedido.total_unidades }}</div>
+    </article>
+
+    <article class="kpi-card">
+        <div class="flex justify-between items-center mb-4">
+            <span class="kpi-label">Total pedido</span>
+        </div>
+        <div class="kpi-value text-brand-500">${{ pedido.total_pedido|floatformat:2 }}</div>
+    </article>
+</div>
+
+<article class="card p-6">
+    <h2 class="font-display text-xl font-bold text-white mb-6">Líneas del pedido</h2>
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead class="border-b border-dark-600">
+                <tr>
+                    <th class="text-left py-4 px-4 text-xs uppercase tracking-wider text-slate-500 font-semibold">Producto</th>
+                    <th class="text-right py-4 px-4 text-xs uppercase tracking-wider text-slate-500 font-semibold">Cantidad</th>
+                    <th class="text-right py-4 px-4 text-xs uppercase tracking-wider text-slate-500 font-semibold">Preparado</th>
+                    <th class="text-right py-4 px-4 text-xs uppercase tracking-wider text-slate-500 font-semibold">Precio</th>
+                    <th class="text-right py-4 px-4 text-xs uppercase tracking-wider text-slate-500 font-semibold">Subtotal</th>
+                    <th class="text-left py-4 px-4 text-xs uppercase tracking-wider text-slate-500 font-semibold">Origen</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for linea in lineas %}
+                <tr class="table-row">
+                    <td class="py-4 px-4">
+                        <div class="text-brand-500 font-semibold text-xs font-mono">{{ linea.producto.sku }}</div>
+                        <div class="text-slate-400 text-[11px] mt-1">{{ linea.producto.nombre }}</div>
+                    </td>
+                    <td class="py-4 px-4 text-right text-slate-300">{{ linea.cantidad }}</td>
+                    <td class="py-4 px-4 text-right font-bold text-white">{{ linea.cantidad_preparada }}</td>
+                    <td class="py-4 px-4 text-right text-slate-300">${{ linea.precio_unitario|floatformat:2 }}</td>
+                    <td class="py-4 px-4 text-right font-bold text-white">${{ linea.subtotal|floatformat:2 }}</td>
+                    <td class="py-4 px-4 text-slate-400 text-xs font-mono">{{ linea.ubicacion_origen.codigo|default:"—" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="py-12 text-center text-slate-500">No hay líneas en este pedido.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</article>
+
+{% endblock %}

@@ -1,83 +1,76 @@
-# Sistema WMS TechStock
+# C.TECH WMS - Sistema de Gestión de Almacenes
 
-Sistema de Gestión de Almacenes (WMS) con Django 5.2 LTS.
+Sistema WMS desarrollado con Django 5.2 LTS para **C.TECH - Servicio y Calidad**.
 
-Universidad Politécnica Estatal del Carchi - Carrera de Logística y Transporte.
+Universidad Politécnica Estatal del Carchi  
+Carrera de Logística y Transporte
 
-## Módulos
+## 🎯 Módulos implementados
 
-- Catálogo
-- Almacén
-- Inventario
-- Recepción
-- Despacho
-- Usuarios
+- **Catálogo** — productos, categorías, marcas, proveedores
+- **Almacén** — bodegas, zonas, ubicaciones con mapa visual
+- **Inventario** — existencias, kardex, servicios transaccionales
+- **Recepción** — órdenes de recepción con putaway
+- **Despacho** — clientes, pedidos, picking con validación de stock
+- **Servicio Técnico** — equipos por IMEI (en desarrollo)
+- **Mi Espacio** — tareas, eventos, metas, notas
+- **Reportes** — análisis con exportación PDF/Excel/Word
 
-## Requisitos previos
+## 👥 Sistema de usuarios
 
-- Python 3.13+
+| Usuario | Contraseña | Rol | Acceso |
+|---------|-----------|-----|--------|
+| `Andrewnot` | (crear) | ADMIN | Todo |
+| `jefe_bodega` | `jefe123` | JEFE | Todo menos admin |
+| `operario_catalogo` | `operario123` | OPERARIO | Catálogo |
+| `operario_almacen` | `operario123` | OPERARIO | Almacén |
+| `operario_inventario` | `operario123` | OPERARIO | Inventario |
+| `operario_recepcion` | `operario123` | OPERARIO | Recepción |
+| `operario_despacho` | `operario123` | OPERARIO | Despacho |
+| `tecnico` | `tecnico123` | OPERARIO | Servicio |
+| `vendedor` | `vendedor123` | OPERARIO | Despacho |
+| `cliente` | `cliente123` | CONSULTA | Solo lectura |
+
+## 📋 Requisitos previos
+
+- Python 3.13+ (marcar "Add python.exe to PATH")
 - Git
 - Node.js LTS
-- VS Code
+- Visual Studio Code
 
-## Instalación
+## 🚀 Instalación
 
-    git clone https://github.com/Andrew-not/wms-upec.git
-    cd wms-upec
-    python -m venv .venv
-    .\.venv\Scripts\Activate.ps1
-    python -m pip install --upgrade pip
-    pip install -r requirements.txt
-    npm install
-    copy .env.example .env
+```powershell
+# 1. Clonar repositorio
+git clone https://github.com/Andrew-not/wms-upec.git
+cd wms-upec
 
-Generar SECRET_KEY:
+# 2. Entorno virtual
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
 
-    python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+# 3. Dependencias
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+npm install
 
-Pegar el resultado en .env
+# 4. Archivo .env
+copy .env.example .env
 
-    python manage.py migrate
-    python manage.py cargar_datos_demo
-    python manage.py createsuperuser
-    python manage.py configurar_permisos
+# 5. Generar SECRET_KEY
+python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
 
-## Ejecutar (2 terminales)
+# Pegar el resultado en .env
 
-Terminal 1 - Tailwind:
+# 6. Base de datos
+python manage.py migrate
+python manage.py cargar_datos_demo --reset
+python manage.py createsuperuser
+python manage.py crear_usuarios_sistema
 
-    npx tailwindcss -i ./static/src/input.css -o ./static/css/output.css --watch
+# 7. Servidor (2 terminales)
+# Terminal 1:
+npx tailwindcss -i ./static/src/input.css -o ./static/css/output.css --watch
 
-Terminal 2 - Django:
-
-    .\.venv\Scripts\Activate.ps1
-    python manage.py runserver
-
-Abrir: http://127.0.0.1:8000/
-
-## URLs
-
-| URL | Módulo |
-|-----|--------|
-| / | Dashboard |
-| /catalogo/productos/ | Catálogo |
-| /almacen/ubicaciones/ | Almacén |
-| /almacen/mapa/ | Mapa |
-| /inventario/kardex/ | Kardex |
-| /recepcion/ordenes/ | Recepción |
-| /despacho/pedidos/ | Despacho |
-| /admin/ | Admin |
-
-## Credenciales
-
-- Admin: tu superusuario
-- Operario: operario / operario123
-
-## Documentación
-
-- docs/ARQUITECTURA.md
-- docs/MODULO_INVENTARIO.md
-- docs/MODULO_CATALOGO.md
-- docs/MODULO_ALMACEN.md
-- docs/MODULO_RECEPCION.md
-- docs/MODULO_DESPACHO.md
+# Terminal 2:
+python manage.py runserver

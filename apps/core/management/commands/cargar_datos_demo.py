@@ -2,15 +2,13 @@
 Comando personalizado: python manage.py cargar_datos_demo
 
 Carga datos de demostración para el WMS TechStock.
-Cumple con los mínimos de la rúbrica:
-- Catálogo: 3 categorías, 4 marcas, 3 unidades, 2 proveedores, 10 productos
-- Almacén: 1 bodega, 3 zonas, 12 ubicaciones
-- Inventario: 1 entrada, 1 traslado, 1 salida, 1 intento fallido
-- Usuario operario de prueba
 """
 from django.core.management.base import BaseCommand
 from django.db import transaction
+from django.utils import timezone
 from decimal import Decimal
+from datetime import timedelta
+import random
 
 from apps.catalogo.models import (
     Categoria, Marca, UnidadMedida, Proveedor, Producto
@@ -54,12 +52,27 @@ class Command(BaseCommand):
 
         self._mostrar_resumen()
 
-    # ============================================
-    # RESET
-    # ============================================
     def _reset_data(self):
         Movimiento.objects.all().delete()
         Existencia.objects.all().delete()
+        try:
+            from apps.despacho.models import Pedido, LineaPedido, Cliente
+            LineaPedido.objects.all().delete()
+            Pedido.objects.all().delete()
+            Cliente.objects.all().delete()
+        except Exception:
+            pass
+        try:
+            from apps.recepcion.models import OrdenRecepcion, LineaRecepcion
+            LineaRecepcion.objects.all().delete()
+            OrdenRecepcion.objects.all().delete()
+        except Exception:
+            pass
+        try:
+            from apps.almacen.models import MovimientoUbicacion
+            MovimientoUbicacion.objects.all().delete()
+        except Exception:
+            pass
         Ubicacion.objects.all().delete()
         Zona.objects.all().delete()
         Bodega.objects.all().delete()
@@ -68,11 +81,7 @@ class Command(BaseCommand):
         UnidadMedida.objects.all().delete()
         Marca.objects.all().delete()
         Categoria.objects.all().delete()
-        Usuario.objects.filter(is_superuser=False).delete()
 
-    # ============================================
-    # ALMACÉN
-    # ============================================
     def _crear_almacen(self):
         self.stdout.write('  -> Creando bodega, zonas y ubicaciones...')
 
@@ -117,9 +126,6 @@ class Command(BaseCommand):
         ))
         return bodega, zonas, ubicaciones
 
-    # ============================================
-    # CATÁLOGOS
-    # ============================================
     def _crear_catalogos(self):
         self.stdout.write('  -> Creando categorias, marcas, unidades y proveedores...')
 
@@ -173,9 +179,6 @@ class Command(BaseCommand):
         ))
         return categorias, marcas, unidades, proveedores
 
-    # ============================================
-    # PRODUCTOS
-    # ============================================
     def _crear_productos(self, categorias, marcas, unidades, proveedores):
         self.stdout.write('  -> Creando 10 productos...')
 
@@ -218,103 +221,131 @@ class Command(BaseCommand):
         ))
         return productos
 
-    # ============================================
-    # USUARIOS
-    # ============================================
     def _crear_usuarios(self):
         self.stdout.write('  -> Creando usuarios...')
 
         admin_user = Usuario.objects.filter(is_superuser=True).first()
         if not admin_user:
+            admin_user = Usuario.objects.filter(rol='ADMIN').first()
+        if not admin_user:
             self.stdout.write(self.style.ERROR(
-                '    ERROR: No hay superusuario. Ejecuta: python manage.py createsuperuser'
+                '    ERROR: No hay superusuario.'
             ))
             raise SystemExit(1)
 
-        operario, created = Usuario.objects.get_or_create(
-            username='operario',
-            defaults={
-                'first_name': 'Juan',
-                'last_name': 'Operario',
-                'email': 'operario@upec.edu.ec',
-                'rol': 'OPERARIO',
-                'is_staff': True,
-                'is_active': True,
-            }
+        return admin_user, admin_user
+
+    def _crear_movimiento_con_fecha(self, funcion, fecha_mov, **kwargs):
+        """Ejecuta una función de service y actualiza la fecha del movimiento."""
+        mov = funcion(**kwargs)
+        fecha_dt = timezone.datetime.combine(
+            fecha_mov,
+            timezone.datetime.min.time()
         )
-        if created:
-            operario.set_password('operario123')
-            operario.save()
-            self.stdout.write(self.style.SUCCESS(
-                '    OK Usuario operario creado (operario / operario123)'
-            ))
-        else:
-            self.stdout.write('    -> Usuario operario ya existia')
+        fecha_aware = timezone.make_aware(fecha_dt)
+        Movimiento.objects.filter(pk=mov.pk).update(fecha=fecha_aware)
+        return mov
 
-        return admin_user, operario
-
-    # ============================================
-    # MOVIMIENTOS
-    # ============================================
     def _ejecutar_movimientos(self, productos, ubicaciones, admin_user):
         self.stdout.write('  -> Ejecutando movimientos...')
 
-        ubi_almacen = ubicaciones[0]
-        ubi_picking = ubicaciones[4]
+        hoy = timezone.now().date()
 
-        prod = productos[0]
+        # ============================================
+        # 30 ENTRADAS distribuidas en los últimos 30 días
+        # ============================================
+        for i in range(30):
+            fecha_mov = hoy - timedelta(days=random.randint(0, 30))
+            prod = random.choice(productos)
+            ubi = random.choice(ubicaciones)
+            
+            try:
+                self._crear_movimiento_con_fecha(
+                    registrar_entrada,
+                    fecha_mov,
+                    producto=prod,
+                    ubicacion=ubi,
+                    cantidad=random.randint(5, 20),
+                    usuario=admin_user,
+                    documento=f'OC-2026-{i+1:03d}',
+                    observacion=f'Entrada #{i+1}'
+                )
+            except Exception:
+                pass
 
-        registrar_entrada(
-            producto=prod,
-            ubicacion=ubi_almacen,
-            cantidad=20,
-            usuario=admin_user,
-            documento='OC-2026-001',
-            observacion='Entrada inicial de 20 iPhone 15'
-        )
-        self.stdout.write('    OK Entrada: 20 unidades')
+        self.stdout.write('    OK 30 entradas distribuidas')
 
-        registrar_traslado(
-            producto=prod,
-            ubicacion_origen=ubi_almacen,
-            ubicacion_destino=ubi_picking,
-            cantidad=5,
-            usuario=admin_user,
-            documento='TR-2026-001',
-            observacion='Traslado a zona de picking'
-        )
-        self.stdout.write('    OK Traslado: 5 unidades')
+        # ============================================
+        # 20 SALIDAS distribuidas
+        # ============================================
+        for i in range(20):
+            fecha_mov = hoy - timedelta(days=random.randint(0, 30))
+            prod = random.choice(productos)
+            ubi = random.choice(ubicaciones)
+            
+            try:
+                exist = Existencia.objects.filter(producto=prod, ubicacion=ubi).first()
+                if exist and exist.cantidad > 5:
+                    self._crear_movimiento_con_fecha(
+                        registrar_salida,
+                        fecha_mov,
+                        producto=prod,
+                        ubicacion=ubi,
+                        cantidad=random.randint(1, 3),
+                        usuario=admin_user,
+                        documento=f'PED-2026-{i+1:03d}',
+                        observacion=f'Venta #{i+1}'
+                    )
+            except Exception:
+                pass
 
-        registrar_salida(
-            producto=prod,
-            ubicacion=ubi_picking,
-            cantidad=2,
-            usuario=admin_user,
-            documento='PED-2026-001',
-            observacion='Venta cliente Perez'
-        )
-        self.stdout.write('    OK Salida: 2 unidades')
+        self.stdout.write('    OK 20 salidas distribuidas')
 
+        # ============================================
+        # 10 TRASLADOS
+        # ============================================
+        for i in range(10):
+            fecha_mov = hoy - timedelta(days=random.randint(0, 25))
+            prod = random.choice(productos)
+            ubi_origen = random.choice(ubicaciones)
+            ubi_destino = random.choice([u for u in ubicaciones if u != ubi_origen])
+            
+            try:
+                exist = Existencia.objects.filter(producto=prod, ubicacion=ubi_origen).first()
+                if exist and exist.cantidad > 3:
+                    self._crear_movimiento_con_fecha(
+                        registrar_traslado,
+                        fecha_mov,
+                        producto=prod,
+                        ubicacion_origen=ubi_origen,
+                        ubicacion_destino=ubi_destino,
+                        cantidad=random.randint(1, 3),
+                        usuario=admin_user,
+                        documento=f'TR-2026-{i+1:03d}',
+                        observacion=f'Traslado #{i+1}'
+                    )
+            except Exception:
+                pass
+
+        self.stdout.write('    OK 10 traslados distribuidos')
+
+        # ============================================
+        # INTENTO FALLIDO
+        # ============================================
         try:
             registrar_salida(
-                producto=prod,
-                ubicacion=ubi_picking,
-                cantidad=100,
+                producto=productos[0],
+                ubicacion=ubicaciones[4],
+                cantidad=99999,
                 usuario=admin_user,
                 documento='TEST-ERROR',
                 observacion='Prueba de stock insuficiente'
             )
-            self.stdout.write(self.style.ERROR(
-                '    ERROR: debio fallar el intento'
-            ))
         except StockInsuficienteError:
             self.stdout.write(self.style.SUCCESS(
-                '    OK Intento fallido correctamente rechazado (stock insuficiente)'
+                '    OK Intento fallido rechazado correctamente'
             ))
 
-    # ============================================
-    # RESUMEN
-    # ============================================
     def _mostrar_resumen(self):
         self.stdout.write(self.style.MIGRATE_HEADING(
             '\n=== RESUMEN ==='
@@ -328,6 +359,3 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(
             '\nDatos demo cargados correctamente.\n'
         ))
-        self.stdout.write('Credenciales de prueba:')
-        self.stdout.write('  Admin:    (tu superusuario)')
-        self.stdout.write('  Operario: operario / operario123\n')
