@@ -1,29 +1,29 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
+
 class Usuario(AbstractUser):
     """
-    Modelo de usuario personalizado para el WMS
+    Modelo de usuario personalizado para C.TECH.
     """
     
-    # Roles posibles en el sistema
     ROLES = (
         ('ADMIN', 'Administrador'),
-        ('JEFE_BODEGA', 'Jefe de Bodega'),
+        ('JEFE', 'Jefe'),
         ('OPERARIO', 'Operario'),
         ('CONSULTA', 'Consulta'),
     )
     
     cedula = models.CharField(
-        'Cédula', 
-        max_length=10, 
+        'Cédula',
+        max_length=10,
         unique=True,
         blank=True,
         null=True
     )
     telefono = models.CharField(
-        'Teléfono', 
-        max_length=15, 
+        'Teléfono',
+        max_length=15,
         blank=True,
         null=True
     )
@@ -32,6 +32,12 @@ class Usuario(AbstractUser):
         max_length=20,
         choices=ROLES,
         default='CONSULTA'
+    )
+    cargo = models.CharField(
+        'Cargo',
+        max_length=100,
+        blank=True,
+        help_text='Ej: Jefe de Bodega, Técnico, Vendedor'
     )
     fecha_registro = models.DateTimeField(
         'Fecha de registro',
@@ -50,5 +56,5 @@ class Usuario(AbstractUser):
     def __str__(self):
         nombre = self.get_full_name().strip()
         if nombre:
-            return f"{nombre} ({self.username}) - {self.get_rol_display()}"
+            return f"{nombre} - {self.get_rol_display()}"
         return f"{self.username} - {self.get_rol_display()}"

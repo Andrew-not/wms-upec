@@ -4,60 +4,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar sesión · TechStock WMS</title>
+    <title>Iniciar sesión · C.TECH</title>
 
-    <!-- Fuentes -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Tailwind -->
     <link rel="stylesheet" href="{% static 'css/output.css' %}">
 </head>
-<body class="min-h-screen bg-base-900 text-slate-100 font-sans antialiased">
+<body class="min-h-screen bg-dark-900 text-white font-sans antialiased">
 
-<!-- Fondo con gradientes sutiles -->
-<div class="fixed inset-0 -z-10">
-    <div class="absolute inset-0 bg-base-900"></div>
-    <div class="absolute top-0 left-1/4 w-96 h-96 bg-accent-blue/10 rounded-full blur-3xl"></div>
-    <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-accent-purple/10 rounded-full blur-3xl"></div>
-    <div class="absolute top-1/2 left-1/2 w-64 h-64 bg-accent-cyan/5 rounded-full blur-3xl"></div>
+<!-- Fondo con glows -->
+<div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+    <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-brand-500/10 rounded-full blur-3xl"></div>
+    <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-brand-500/5 rounded-full blur-3xl"></div>
 </div>
 
-<!-- Contenido -->
 <div class="min-h-screen flex items-center justify-center p-4">
 
     <div class="w-full max-w-md">
 
-        <!-- Logo y marca -->
+        <!-- Logo -->
         <div class="text-center mb-8">
-            <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl
-                        bg-gradient-to-br from-accent-blue to-accent-purple
-                        shadow-2xl shadow-sky-500/30 mb-4">
-                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-brand-500 shadow-2xl shadow-glow-brand mb-4">
+                <svg class="w-8 h-8 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
                 </svg>
             </div>
             <h1 class="font-display text-3xl font-bold text-white mb-1">
-                TechStock
+                C<span class="text-brand-500">.</span>TECH
             </h1>
-            <p class="text-slate-400 text-sm">
-                Sistema de Gestión de Almacenes
+            <p class="text-slate-500 text-sm uppercase tracking-widest">
+                Servicio y Calidad
             </p>
         </div>
 
         <!-- Card del formulario -->
-        <div class="bg-base-800/80 backdrop-blur-xl border border-base-600/50 rounded-2xl p-8 shadow-2xl shadow-black/40">
+        <div class="bg-dark-800 border border-dark-600 rounded-3xl p-8 shadow-card">
 
             <h2 class="font-display text-xl font-bold text-white mb-1">
                 Iniciar sesión
             </h2>
-            <p class="text-slate-400 text-sm mb-6">
-                Accede con tus credenciales institucionales
+            <p class="text-slate-500 text-sm mb-6">
+                Accede con tus credenciales
             </p>
 
             {% if form.errors %}
-                <div class="mb-5 flex items-start gap-3 p-3 rounded-lg bg-red-500/10 border border-red-500/20">
+                <div class="mb-5 flex items-start gap-3 p-3 rounded-2xl bg-red-500/10 border border-red-500/20">
                     <svg class="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                     </svg>
@@ -69,11 +62,11 @@
 
             {% if next %}
                 {% if user.is_authenticated %}
-                    <div class="mb-5 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-sm text-amber-300">
+                    <div class="mb-5 p-3 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-sm text-amber-300">
                         No tienes permiso para acceder a esa página.
                     </div>
                 {% else %}
-                    <div class="mb-5 p-3 rounded-lg bg-sky-500/10 border border-sky-500/20 text-sm text-sky-300">
+                    <div class="mb-5 p-3 rounded-2xl bg-brand-500/10 border border-brand-500/20 text-sm text-brand-300">
                         Inicia sesión para acceder a esa página.
                     </div>
                 {% endif %}
@@ -88,7 +81,7 @@
                         Usuario
                     </label>
                     <div class="relative">
-                        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                         </svg>
                         <input type="text"
@@ -97,11 +90,7 @@
                                placeholder="tu.usuario"
                                autofocus
                                required
-                               class="w-full pl-10 pr-4 py-3 rounded-lg
-                                      bg-base-900 border border-base-600
-                                      text-white placeholder-slate-500
-                                      focus:border-accent-blue focus:ring-2 focus:ring-accent-blue/20
-                                      outline-none transition-all">
+                               class="w-full pl-11 pr-4 py-3 rounded-2xl bg-dark-900 border border-dark-600 text-white placeholder-slate-500 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 outline-none transition-all">
                     </div>
                 </div>
 
@@ -111,7 +100,7 @@
                         Contraseña
                     </label>
                     <div class="relative">
-                        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                         </svg>
                         <input type="password"
@@ -119,37 +108,26 @@
                                id="id_password"
                                placeholder="••••••••"
                                required
-                               class="w-full pl-10 pr-4 py-3 rounded-lg
-                                      bg-base-900 border border-base-600
-                                      text-white placeholder-slate-500
-                                      focus:border-accent-blue focus:ring-2 focus:ring-accent-blue/20
-                                      outline-none transition-all">
+                               class="w-full pl-11 pr-4 py-3 rounded-2xl bg-dark-900 border border-dark-600 text-white placeholder-slate-500 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 outline-none transition-all">
                     </div>
                 </div>
 
                 <!-- Botón -->
                 <button type="submit"
-                        class="w-full py-3 rounded-lg
-                               bg-gradient-to-r from-accent-blue to-accent-purple
-                               hover:from-sky-500 hover:to-violet-500
-                               text-white font-medium
-                               shadow-lg shadow-sky-500/25
-                               transition-all transform hover:scale-[1.01] active:scale-[0.99]">
+                        class="w-full py-3.5 rounded-2xl bg-brand-500 hover:bg-brand-600 text-white font-bold shadow-lg shadow-glow-brand transition-all">
                     Iniciar sesión
                 </button>
             </form>
 
-            <!-- Info -->
-            <div class="mt-6 pt-6 border-t border-base-600/50 text-center">
+            <div class="mt-6 pt-6 border-t border-dark-600 text-center">
                 <p class="text-xs text-slate-500">
                     ¿Problemas para acceder? Contacta al administrador
                 </p>
             </div>
         </div>
 
-        <!-- Footer -->
-        <div class="mt-6 text-center text-xs text-slate-500">
-            Universidad Politécnica Estatal del Carchi · {% now "Y" %}
+        <div class="mt-6 text-center text-xs text-slate-600">
+            C.TECH · Servicio y Calidad · {% now "Y" %}
         </div>
     </div>
 </div>

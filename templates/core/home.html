@@ -1,114 +1,103 @@
 {% extends 'base.html' %}
 
-{% block title %}Dashboard · TechStock{% endblock %}
+{% block title %}Dashboard · C.TECH{% endblock %}
 
 {% block content %}
 
-<div class="flex justify-between items-end mb-6">
+<div class="flex justify-between items-end mb-8">
     <div>
-        <p class="text-sm text-slate-500 dark:text-slate-400 mb-1">Inicio › Dashboard</p>
-        <h1 class="font-display text-3xl font-bold text-slate-900 dark:text-white">Dashboard</h1>
-        <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">
-            Resumen general del sistema de gestión de almacenes
-        </p>
+        <p class="text-sm text-slate-500 mb-2">Inicio › Dashboard</p>
+        <h1 class="font-display text-4xl font-bold text-white">Dashboard</h1>
+        <p class="text-slate-400 text-sm mt-2">Resumen general del sistema</p>
     </div>
-    <a href="/admin/catalogo/producto/add/" target="_blank"
-       class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg
-              bg-accent-blue hover:bg-sky-600 text-white text-sm font-medium
-              shadow-lg shadow-sky-500/20 transition-all">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+    <a href="/admin/catalogo/producto/add/" target="_blank" class="btn btn-primary">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
         </svg>
         Nuevo producto
     </a>
 </div>
 
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+<!-- KPIs -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5 mb-8">
 
-    <article class="bg-white dark:bg-base-800 border border-slate-200 dark:border-base-600/50 rounded-2xl p-5 relative overflow-hidden">
-        <div class="absolute -top-8 -right-8 w-24 h-24 rounded-full bg-accent-blue/10"></div>
-        <div class="flex justify-between items-center mb-3">
-            <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">Productos activos</span>
-            <div class="w-9 h-9 rounded-lg bg-accent-blue/10 flex items-center justify-center">
-                <svg class="w-4 h-4 text-accent-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+    <article class="kpi-card">
+        <div class="flex justify-between items-center mb-4">
+            <span class="kpi-label">Productos</span>
+            <div class="kpi-icon bg-brand-500/10">
+                <svg class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
                 </svg>
             </div>
         </div>
-        <div class="font-display text-3xl font-bold text-slate-900 dark:text-white">{{ total_productos }}</div>
-        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">SKUs en catálogo</p>
+        <div class="kpi-value">{{ total_productos }}</div>
+        <p class="text-xs text-slate-500 mt-2">SKUs en catálogo</p>
     </article>
 
-    <article class="bg-white dark:bg-base-800 border border-slate-200 dark:border-base-600/50 rounded-2xl p-5 relative overflow-hidden">
-        <div class="absolute -top-8 -right-8 w-24 h-24 rounded-full bg-accent-cyan/10"></div>
-        <div class="flex justify-between items-center mb-3">
-            <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">Ubicaciones</span>
-            <div class="w-9 h-9 rounded-lg bg-accent-cyan/10 flex items-center justify-center">
-                <svg class="w-4 h-4 text-accent-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+    <article class="kpi-card">
+        <div class="flex justify-between items-center mb-4">
+            <span class="kpi-label">Ubicaciones</span>
+            <div class="kpi-icon bg-sky-500/10">
+                <svg class="w-5 h-5 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                 </svg>
             </div>
         </div>
-        <div class="font-display text-3xl font-bold text-slate-900 dark:text-white">{{ total_ubicaciones }}</div>
-        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Posiciones activas</p>
+        <div class="kpi-value">{{ total_ubicaciones }}</div>
+        <p class="text-xs text-slate-500 mt-2">Posiciones activas</p>
     </article>
 
-    <article class="bg-white dark:bg-base-800 border border-slate-200 dark:border-base-600/50 rounded-2xl p-5 relative overflow-hidden">
-        <div class="absolute -top-8 -right-8 w-24 h-24 rounded-full bg-accent-green/10"></div>
-        <div class="flex justify-between items-center mb-3">
-            <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">Stock total</span>
-            <div class="w-9 h-9 rounded-lg bg-accent-green/10 flex items-center justify-center">
-                <svg class="w-4 h-4 text-accent-green" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+    <article class="kpi-card">
+        <div class="flex justify-between items-center mb-4">
+            <span class="kpi-label">Stock total</span>
+            <div class="kpi-icon bg-emerald-500/10">
+                <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                 </svg>
             </div>
         </div>
-        <div class="font-display text-3xl font-bold text-slate-900 dark:text-white">{{ stock_total }}</div>
-        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Unidades en sistema</p>
+        <div class="kpi-value">{{ stock_total }}</div>
+        <p class="text-xs text-slate-500 mt-2">Unidades en sistema</p>
     </article>
 
-    <article class="bg-white dark:bg-base-800 border border-slate-200 dark:border-base-600/50 rounded-2xl p-5 relative overflow-hidden">
-        <div class="absolute -top-8 -right-8 w-24 h-24 rounded-full bg-accent-red/10"></div>
-        <div class="flex justify-between items-center mb-3">
-            <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">Bajo stock</span>
-            <div class="w-9 h-9 rounded-lg bg-accent-red/10 flex items-center justify-center">
-                <svg class="w-4 h-4 text-accent-red" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+    <article class="kpi-card">
+        <div class="flex justify-between items-center mb-4">
+            <span class="kpi-label">Bajo stock</span>
+            <div class="kpi-icon bg-red-500/10">
+                <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                 </svg>
             </div>
         </div>
-        <div class="font-display text-3xl font-bold text-slate-900 dark:text-white">{{ bajo_stock }}</div>
-        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Productos bajo mínimo</p>
+        <div class="kpi-value">{{ bajo_stock }}</div>
+        <p class="text-xs text-slate-500 mt-2">Productos bajo mínimo</p>
     </article>
 
-    <article class="bg-white dark:bg-base-800 border border-slate-200 dark:border-base-600/50 rounded-2xl p-5 relative overflow-hidden">
-        <div class="absolute -top-8 -right-8 w-24 h-24 rounded-full bg-accent-purple/10"></div>
-        <div class="flex justify-between items-center mb-3">
-            <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">Movimientos hoy</span>
-            <div class="w-9 h-9 rounded-lg bg-accent-purple/10 flex items-center justify-center">
-                <svg class="w-4 h-4 text-accent-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+    <article class="kpi-card">
+        <div class="flex justify-between items-center mb-4">
+            <span class="kpi-label">Movimientos hoy</span>
+            <div class="kpi-icon bg-violet-500/10">
+                <svg class="w-5 h-5 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
             </div>
         </div>
-        <div class="font-display text-3xl font-bold text-slate-900 dark:text-white">{{ movimientos_hoy }}</div>
-        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Entradas, salidas, traslados</p>
+        <div class="kpi-value">{{ movimientos_hoy }}</div>
+        <p class="text-xs text-slate-500 mt-2">Entradas, salidas, traslados</p>
     </article>
 </div>
 
-<article class="bg-white dark:bg-base-800 border border-slate-200 dark:border-base-600/50 rounded-2xl p-5">
-    <div class="flex justify-between items-center mb-5">
+<!-- Últimos movimientos -->
+<article class="card p-6">
+    <div class="flex justify-between items-center mb-6">
         <div>
-            <h2 class="font-display text-lg font-bold text-slate-900 dark:text-white">Últimos movimientos</h2>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Registro reciente del kardex</p>
+            <h2 class="font-display text-xl font-bold text-white">Últimos movimientos</h2>
+            <p class="text-sm text-slate-500 mt-1">Registro reciente del kardex</p>
         </div>
-        <a href="{% url 'inventario:kardex' %}"
-           class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium
-                  bg-slate-100 dark:bg-base-700 text-slate-700 dark:text-slate-200
-                  hover:bg-slate-200 dark:hover:bg-base-600 transition-colors">
+        <a href="{% url 'inventario:kardex' %}" class="btn btn-secondary text-xs">
             Ver kardex
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
             </svg>
         </a>
@@ -116,46 +105,44 @@
 
     <div class="overflow-x-auto">
         <table class="w-full text-sm">
-            <thead>
-                <tr class="border-b border-slate-200 dark:border-base-600/50">
-                    <th class="text-left py-3 px-3 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">Fecha</th>
-                    <th class="text-left py-3 px-3 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">Tipo</th>
-                    <th class="text-left py-3 px-3 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">Producto</th>
-                    <th class="text-left py-3 px-3 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">Cant.</th>
-                    <th class="text-left py-3 px-3 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">Origen</th>
-                    <th class="text-left py-3 px-3 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">Destino</th>
-                    <th class="text-left py-3 px-3 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">Usuario</th>
+            <thead class="border-b border-dark-600">
+                <tr>
+                    <th class="text-left py-4 px-4 text-xs uppercase tracking-wider text-slate-500 font-semibold">Fecha</th>
+                    <th class="text-left py-4 px-4 text-xs uppercase tracking-wider text-slate-500 font-semibold">Tipo</th>
+                    <th class="text-left py-4 px-4 text-xs uppercase tracking-wider text-slate-500 font-semibold">Producto</th>
+                    <th class="text-left py-4 px-4 text-xs uppercase tracking-wider text-slate-500 font-semibold">Cant.</th>
+                    <th class="text-left py-4 px-4 text-xs uppercase tracking-wider text-slate-500 font-semibold">Origen</th>
+                    <th class="text-left py-4 px-4 text-xs uppercase tracking-wider text-slate-500 font-semibold">Destino</th>
+                    <th class="text-left py-4 px-4 text-xs uppercase tracking-wider text-slate-500 font-semibold">Usuario</th>
                 </tr>
             </thead>
             <tbody>
                 {% for mov in ultimos_movimientos %}
-                <tr class="border-b border-slate-100 dark:border-base-600/30 hover:bg-slate-50 dark:hover:bg-base-700/30 transition-colors">
-                    <td class="py-3 px-3 text-slate-600 dark:text-slate-300">{{ mov.fecha|date:"d/m H:i" }}</td>
-                    <td class="py-3 px-3">
+                <tr class="table-row">
+                    <td class="py-4 px-4 text-slate-400 text-xs">{{ mov.fecha|date:"d/m H:i" }}</td>
+                    <td class="py-4 px-4">
                         {% if mov.tipo == 'ENTRADA' %}
-                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Entrada</span>
+                            <span class="badge badge-success">Entrada</span>
                         {% elif mov.tipo == 'SALIDA' %}
-                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-medium bg-red-500/10 text-red-400 border border-red-500/20">Salida</span>
+                            <span class="badge badge-danger">Salida</span>
                         {% elif mov.tipo == 'TRASLADO' %}
-                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-medium bg-sky-500/10 text-sky-400 border border-sky-500/20">Traslado</span>
+                            <span class="badge badge-info">Traslado</span>
                         {% else %}
-                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">{{ mov.get_tipo_display }}</span>
+                            <span class="badge badge-warning">{{ mov.get_tipo_display }}</span>
                         {% endif %}
                     </td>
-                    <td class="py-3 px-3">
-                        <strong class="text-slate-900 dark:text-white">{{ mov.producto.sku }}</strong><br>
-                        <small class="text-slate-500 dark:text-slate-400">{{ mov.producto.nombre }}</small>
+                    <td class="py-4 px-4">
+                        <div class="text-white font-semibold text-xs">{{ mov.producto.sku }}</div>
+                        <div class="text-slate-500 text-[11px]">{{ mov.producto.nombre }}</div>
                     </td>
-                    <td class="py-3 px-3 text-slate-600 dark:text-slate-300">{{ mov.cantidad }}</td>
-                    <td class="py-3 px-3 text-slate-600 dark:text-slate-300">{{ mov.ubicacion_origen.codigo|default:"—" }}</td>
-                    <td class="py-3 px-3 text-slate-600 dark:text-slate-300">{{ mov.ubicacion_destino.codigo|default:"—" }}</td>
-                    <td class="py-3 px-3 text-slate-500 dark:text-slate-400">{{ mov.usuario.username }}</td>
+                    <td class="py-4 px-4 text-slate-300 text-sm">{{ mov.cantidad }}</td>
+                    <td class="py-4 px-4 text-slate-400 text-xs font-mono">{{ mov.ubicacion_origen.codigo|default:"—" }}</td>
+                    <td class="py-4 px-4 text-slate-400 text-xs font-mono">{{ mov.ubicacion_destino.codigo|default:"—" }}</td>
+                    <td class="py-4 px-4 text-slate-500 text-xs">{{ mov.usuario.username }}</td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="7" class="py-12 text-center text-slate-500 dark:text-slate-400">
-                        No hay movimientos registrados.
-                    </td>
+                    <td colspan="7" class="py-12 text-center text-slate-500">No hay movimientos registrados.</td>
                 </tr>
                 {% endfor %}
             </tbody>

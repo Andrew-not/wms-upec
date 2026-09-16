@@ -54,6 +54,8 @@ INSTALLED_APPS = [
     'apps.inventario',
     'apps.recepcion',
     'apps.despacho',
+    'apps.servicio',
+    'apps.workspace',
     'apps.reportes',
 ]
 
@@ -150,27 +152,27 @@ from django.templatetags.static import static
 from django.urls import reverse_lazy
 
 UNFOLD = {
-    "SITE_TITLE": "TechStock WMS",
-    "SITE_HEADER": "TechStock · Sistema de Gestión",
+    "SITE_TITLE": "C.TECH WMS",
+    "SITE_HEADER": "C.TECH · Sistema de Gestión",
     "SITE_URL": "/",
-    "SITE_SYMBOL": "inventory_2",  # Icono de Material Symbols
+    "SITE_SYMBOL": "inventory_2",
     "SHOW_HISTORY": True,
     "SHOW_VIEW_ON_SITE": True,
     "DASHBOARD_CALLBACK": "apps.core.dashboard.dashboard_callback",
     
     "COLORS": {
         "primary": {
-            "50":  "240 249 255",
-            "100": "224 242 254",
-            "200": "186 230 253",
-            "300": "125 211 252",
-            "400": "56 189 248",
-            "500": "14 165 233",   # azul principal
-            "600": "2 132 199",
-            "700": "3 105 161",
-            "800": "7 89 133",
-            "900": "12 74 110",
-            "950": "8 47 73",
+            "50":  "255 245 240",
+            "100": "255 230 213",
+            "200": "255 201 168",
+            "300": "255 164 112",
+            "400": "255 133 82",
+            "500": "255 107 53",
+            "600": "229 82 26",
+            "700": "194 62 15",
+            "800": "154 49 9",
+            "900": "122 39 6",
+            "950": "67 20 7",
         },
     },
     
