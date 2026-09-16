@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block title %}Notificaciones · C.TECH{% endblock %}
+
+{% block content %}
+
+<div class="flex justify-between items-end mb-8">
+    <div>
+        <p class="text-sm text-slate-500 mb-2">Mi Espacio › Notificaciones</p>
+        <h1 class="font-display text-4xl font-bold text-white">Notificaciones</h1>
+        <p class="text-slate-400 text-sm mt-2">{{ notificaciones|length }} en total</p>
+    </div>
+    <a href="{% url 'workspace:notificacion_marcar_todas_leidas' %}" class="btn btn-secondary">
+        Marcar todas como leídas
+    </a>
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+    <div class="mb-4 px-5 py-4 rounded-2xl text-sm bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+        {{ message }}
+    </div>
+    {% endfor %}
+{% endif %}
+
+<div class="space-y-3">
+    {% for notif in notificaciones %}
+    <div class="card p-5 {% if not notif.leida %}border-l-4 border-l-brand-500{% endif %}">
+        <div class="flex items-start gap-4">
+            <div class="w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0
+                        {% if notif.tipo == 'URGENT' %}bg-red-500/10
+                        {% elif notif.tipo == 'WARNING' %}bg-amber-500/10
+                        {% elif notif.tipo == 'SUCCESS' %}bg-emerald-500/10
+                        {% else %}bg-sky-500/10{% endif %}">
+                <svg class="w-5 h-5
+                            {% if notif.tipo == 'URGENT' %}text-red-500
+                            {% elif notif.tipo == 'WARNING' %}text-amber-500
+                            {% elif notif.tipo == 'SUCCESS' %}text-emerald-500
+                            {% else %}text-sky-500{% endif %}"
+                     fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                </svg>
+            </div>
+            <div class="flex-1">
+                <div class="flex items-start justify-between mb-1">
+                    <h3 class="font-display text-base font-bold text-white">{{ notif.titulo }}</h3>
+                    {% if not notif.leida %}
+                    <span class="badge badge-brand">Nueva</span>
+                    {% endif %}
+                </div>
+                <p class="text-sm text-slate-400 mb-2">{{ notif.mensaje }}</p>
+                <div class="flex items-center gap-3">
+                    <span class="text-xs text-slate-500">{{ notif.fecha_creacion|date:"d/m/Y H:i" }}</span>
+                    {% if notif.url_destino %}
+                    <a href="{{ notif.url_destino }}" class="text-xs text-brand-400 hover:text-brand-300">
+                        Ver más →
+                    </a>
+                    {% endif %}
+                    {% if not notif.leida %}
+                    <a href="{% url 'workspace:notificacion_marcar_leida' notif.pk %}" 
+                       class="text-xs text-slate-400 hover:text-white">
+                        Marcar como leída
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="card p-12 text-center">
+        <svg class="w-16 h-16 mx-auto mb-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+        </svg>
+        <h3 class="font-display text-lg font-bold text-white mb-2">Sin notificaciones</h3>
+        <p class="text-slate-500 text-sm">Aquí verás tus notificaciones</p>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

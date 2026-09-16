@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}Mensajes · C.TECH{% endblock %}
+
+{% block content %}
+
+<div class="flex justify-between items-end mb-8">
+    <div>
+        <p class="text-sm text-slate-500 mb-2">Mi Espacio › Mensajes</p>
+        <h1 class="font-display text-4xl font-bold text-white">Mensajes</h1>
+        <p class="text-slate-400 text-sm mt-2">{{ recibidos|length }} recibidos · {{ enviados|length }} enviados</p>
+    </div>
+    <a href="{% url 'workspace:mensaje_crear' %}" class="btn btn-primary">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+        </svg>
+        Nuevo mensaje
+    </a>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div>
+        <h2 class="font-display text-lg font-bold text-white mb-4">Recibidos</h2>
+        <div class="space-y-3">
+            {% for msg in recibidos %}
+            <a href="{% url 'workspace:mensaje_ver' msg.pk %}" 
+               class="card p-4 block hover:border-brand-500/30 transition-colors {% if not msg.leido %}border-l-4 border-l-brand-500{% endif %}">
+                <div class="flex items-start justify-between mb-2">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-2xl bg-brand-500 flex items-center justify-center text-white font-bold text-xs">
+                            {{ msg.remitente.username|slice:":2"|upper }}
+                        </div>
+                        <div>
+                            <strong class="block text-sm text-white">{{ msg.remitente.username }}</strong>
+                            <small class="text-xs text-slate-500">{{ msg.fecha_envio|date:"d/m H:i" }}</small>
+                        </div>
+                    </div>
+                    {% if not msg.leido %}
+                    <span class="badge badge-brand">Nuevo</span>
+                    {% endif %}
+                </div>
+                <p class="text-sm font-medium text-white mb-1">{{ msg.asunto }}</p>
+                <p class="text-xs text-slate-400 truncate">{{ msg.contenido|truncatechars:80 }}</p>
+            </a>
+            {% empty %}
+            <div class="card p-8 text-center">
+                <p class="text-slate-500 text-sm">Sin mensajes recibidos</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div>
+        <h2 class="font-display text-lg font-bold text-white mb-4">Enviados</h2>
+        <div class="space-y-3">
+            {% for msg in enviados %}
+            <a href="{% url 'workspace:mensaje_ver' msg.pk %}" 
+               class="card p-4 block hover:border-brand-500/30 transition-colors">
+                <div class="flex items-start justify-between mb-2">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-2xl bg-dark-600 flex items-center justify-center text-white font-bold text-xs">
+                            {{ msg.destinatario.username|slice:":2"|upper }}
+                        </div>
+                        <div>
+                            <strong class="block text-sm text-white">Para: {{ msg.destinatario.username }}</strong>
+                            <small class="text-xs text-slate-500">{{ msg.fecha_envio|date:"d/m H:i" }}</small>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-sm font-medium text-white mb-1">{{ msg.asunto }}</p>
+                <p class="text-xs text-slate-400 truncate">{{ msg.contenido|truncatechars:80 }}</p>
+            </a>
+            {% empty %}
+            <div class="card p-8 text-center">
+                <p class="text-slate-500 text-sm">Sin mensajes enviados</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

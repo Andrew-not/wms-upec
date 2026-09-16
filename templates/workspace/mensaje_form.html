@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ accion }} Mensaje · C.TECH{% endblock %}
+
+{% block content %}
+
+<div class="mb-8">
+    <p class="text-sm text-slate-500 mb-2">
+        <a href="{% url 'workspace:mensaje_lista' %}" class="hover:text-brand-500">Mensajes</a> › {{ accion }}
+    </p>
+    <h1 class="font-display text-4xl font-bold text-white">{{ accion }} Mensaje</h1>
+</div>
+
+<div class="card-lg max-w-2xl">
+    <form method="post">
+        {% csrf_token %}
+        <div class="space-y-5">
+            <div>
+                <label class="block text-sm font-medium text-slate-300 mb-2">Destinatario *</label>
+                {{ form.destinatario }}
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-300 mb-2">Asunto *</label>
+                {{ form.asunto }}
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-300 mb-2">Tipo</label>
+                {{ form.tipo }}
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-300 mb-2">Contenido *</label>
+                {{ form.contenido }}
+            </div>
+        </div>
+        <div class="flex items-center gap-3 pt-6 mt-6 border-t border-dark-600">
+            <button type="submit" class="btn btn-primary">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                </svg>
+                Enviar
+            </button>
+            <a href="{% url 'workspace:mensaje_lista' %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

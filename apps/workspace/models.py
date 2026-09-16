@@ -257,3 +257,37 @@ class ActividadReciente(models.Model):
 
     def __str__(self):
         return f'{self.usuario.username} - {self.descripcion}'
+
+
+class Mensaje(models.Model):
+    """Mensajes internos entre usuarios del sistema."""
+    TIPOS = [
+        ('NORMAL', 'Normal'),
+        ('URGENTE', 'Urgente'),
+        ('INFO', 'Información'),
+    ]
+    
+    remitente = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='mensajes_enviados'
+    )
+    destinatario = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='mensajes_recibidos'
+    )
+    asunto = models.CharField('Asunto', max_length=200)
+    contenido = models.TextField('Contenido')
+    tipo = models.CharField('Tipo', max_length=10, choices=TIPOS, default='NORMAL')
+    leido = models.BooleanField('Leído', default=False)
+    fecha_envio = models.DateTimeField('Fecha de envío', auto_now_add=True)
+    fecha_lectura = models.DateTimeField('Fecha de lectura', null=True, blank=True)
+
+    class Meta:
+        verbose_name = 'Mensaje'
+        verbose_name_plural = 'Mensajes'
+        ordering = ['-fecha_envio']
+
+    def __str__(self):
+        return f'De {self.remitente.username} a {self.destinatario.username}: {self.asunto}'

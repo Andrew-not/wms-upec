@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ mensaje.asunto }} · C.TECH{% endblock %}
+
+{% block content %}
+
+<div class="mb-8">
+    <p class="text-sm text-slate-500 mb-2">
+        <a href="{% url 'workspace:mensaje_lista' %}" class="hover:text-brand-500">Mensajes</a> › Ver mensaje
+    </p>
+    <h1 class="font-display text-3xl font-bold text-white">{{ mensaje.asunto }}</h1>
+</div>
+
+<div class="card-lg max-w-3xl">
+    <div class="flex items-start gap-4 pb-5 mb-5 border-b border-dark-600">
+        <div class="w-12 h-12 rounded-2xl bg-brand-500 flex items-center justify-center text-white font-bold">
+            {{ mensaje.remitente.username|slice:":2"|upper }}
+        </div>
+        <div class="flex-1">
+            <p class="text-sm text-white font-medium">
+                De: <strong>{{ mensaje.remitente.get_full_name|default:mensaje.remitente.username }}</strong>
+            </p>
+            <p class="text-sm text-slate-400">
+                Para: <strong>{{ mensaje.destinatario.get_full_name|default:mensaje.destinatario.username }}</strong>
+            </p>
+            <p class="text-xs text-slate-500 mt-1">{{ mensaje.fecha_envio|date:"d/m/Y H:i" }}</p>
+        </div>
+        {% if mensaje.tipo == 'URGENTE' %}
+        <span class="badge badge-danger">Urgente</span>
+        {% elif mensaje.tipo == 'INFO' %}
+        <span class="badge badge-info">Info</span>
+        {% endif %}
+    </div>
+
+    <div class="prose prose-invert max-w-none">
+        <p class="text-slate-200 whitespace-pre-line">{{ mensaje.contenido }}</p>
+    </div>
+
+    <div class="flex items-center gap-3 pt-6 mt-6 border-t border-dark-600">
+        <a href="{% url 'workspace:mensaje_lista' %}" class="btn btn-secondary">
+            Volver a Mensajes
+        </a>
+        <a href="{% url 'workspace:mensaje_crear' %}" class="btn btn-primary">
+            Responder
+        </a>
+    </div>
+</div>
+
+{% endblock %}
