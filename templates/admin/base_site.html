@@ -1,0 +1,32 @@
+{% extends "admin/base.html" %}
+
+{% block branding %}
+<h1 id="site-name">
+    <a href="{% url 'admin:index' %}">C.TECH · Sistema de Gestión</a>
+</h1>
+{% endblock %}
+
+{% block nav-global %}
+<!-- Botón Añadir siempre visible -->
+<style>
+    /* Asegurar que el botón + siempre sea visible */
+    .object-tools {
+        z-index: 999 !important;
+        position: relative;
+    }
+    
+    /* Ajustar el panel de filtros para que no tape */
+    #changelist-filter {
+        max-width: 280px;
+        z-index: 10;
+    }
+    
+    /* Hacer el botón + más visible */
+    .object-tools a.addlink {
+        background: #FF6B35 !important;
+        color: white !important;
+        font-weight: bold !important;
+        box-shadow: 0 2px 8px rgba(255, 107, 53, 0.4) !important;
+    }
+</style>
+{% endblock %}
